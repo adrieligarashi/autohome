@@ -55,8 +55,11 @@ def get_recommendations_uri(sp, playlist_uri, random_sample=True, n_recoms=50):
     return recommendations_uri
 
 
-def create_custom_playlist(sp, recommendations_uri, mood='FALA JÃO!',
-                           public=True, collaborative=False):
+def create_custom_playlist(sp,
+                           recommendations_uri,
+                           mood='FALA JÃO!',
+                           public=True,
+                           collaborative=False):
 
     user_id = sp.current_user()['id']
 
