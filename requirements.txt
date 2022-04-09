@@ -33,3 +33,5 @@ jupyterlab
 matplotlib
 seaborn
 scikit-learn
+paho-mqtt
+streamlit
