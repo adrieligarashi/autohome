@@ -28,4 +28,4 @@ paho-mqtt
 streamlit
 streamlit-webrtc
 opencv-python
-# pyOpenSSL
+pyOpenSSL
