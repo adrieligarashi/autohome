@@ -1,15 +1,37 @@
 import streamlit as st
-import requests
-from datetime import datetime
-import pytz
-import numpy as np
-import pandas as pd
+# import requests
+# from datetime import datetime
+# import pytz
+# import numpy as np
+# import pandas as pd
 import streamlit.components.v1 as components
 
 
 '''
 # Autohome
 '''
+components.html('<video id="video-input" width="480px" height="320px></video>')
+# components.html('<canvas id="canvas-output" width="480px" height="320px></canvas>')
+
+
+components.html('''
+
+
+                <script>
+
+const video = document.getElementById("video-input");
+(async () => {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: false,
+  });
+
+})();
+
+  </script>
+
+                ''',
+                height=600)
 
 
 # if st.checkbox('Inject JAVA'):
@@ -18,7 +40,7 @@ import streamlit.components.v1 as components
 #         """
 #                     <script src="../libs/opencv.min.js"></script>
 #                     <video id="video-input" width="480px" height="320px></video>
-#                     <canvas id="canvas-output" width="480px" height="320px></video>
+#                     <canvas id="canvas-output" width="480px" height="320px></canvas>
 #                     <script src="../javascript/opencv.js"></script>
 #                     <p> oi </p>
 #     """,
