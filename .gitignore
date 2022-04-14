@@ -6,5 +6,4 @@ raw_data/
 *.csv
 **/__pycache__/
 .env
-
-autohome/models/trained_vggface.h5
+autohome/models/
