@@ -5,10 +5,10 @@ install_requirements:
 	@pip install -r requirements.txt
 
 check_code:
-	@flake8 scripts/* autohome/*.py
+	@flake8 scripts/* herokuautohome/*.py
 
 black:
-	@black scripts/* autohome/*.py
+	@black scripts/* herokuautohome/*.py
 
 test:
 	@coverage run -m pytest tests/*.py
@@ -22,8 +22,8 @@ clean:
 	@rm -f .coverage
 	@rm -fr */__pycache__ */*.pyc __pycache__
 	@rm -fr build dist
-	@rm -fr autohome-*.dist-info
-	@rm -fr autohome.egg-info
+	@rm -fr herokuautohome-*.dist-info
+	@rm -fr herokuautohome.egg-info
 
 install:
 	@pip install . -U
@@ -53,3 +53,6 @@ pypi_test:
 
 pypi:
 	@twine upload dist/* -u $(PYPI_USERNAME)
+
+run:
+	@gunicorn -k eventlet -w 1 autohome.app:app --log-file=-
