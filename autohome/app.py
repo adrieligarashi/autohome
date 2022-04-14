@@ -1,10 +1,18 @@
+from cProfile import label
+import json
 from sys import stdout
+from urllib import response
 from autohome.process import webopencv
 import logging
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, request, jsonify
 from flask_socketio import SocketIO, emit
 from autohome.camera import Camera
 from autohome.image_processing import image_proc
+import numpy as np
+
+pred = np.array([0, 0, 0, 0, 0, 0, 1])
+text_list = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+
 
 
 app = Flask(__name__)
@@ -19,7 +27,8 @@ camera = Camera(webopencv())
 
 @socketio.on('input image', namespace='/test')
 def test_message(input):
-
+    global pred
+    global text_list
 
     input = input.split(",")[1]
     camera.enqueue_input(input)
@@ -27,7 +36,7 @@ def test_message(input):
     #image_data = image_data.decode("utf-8")
     #print("IMG_DATA_DECODEDE", type(image_data))
 
-    image_data = image_proc(input)
+    image_data, pred, text_list = image_proc(input)
 
     # print('IMG_DATA', type(image_data))
 
@@ -45,7 +54,16 @@ def test_connect():
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return render_template('index.html')
+    return render_template('index.html',
+                           values=pred.tolist(),
+                           labels=text_list)
+
+
+@app.route('/data', methods=['GET'])
+def data():
+    # response = make_response(json.dumps(pred.tolist()))
+    # response.content_type = 'application/json'
+    return jsonify(result=pred.tolist())
 
 
 def gen():
