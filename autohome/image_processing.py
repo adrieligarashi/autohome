@@ -136,4 +136,4 @@ def image_proc(input):
 
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     image_data = array_to_base64(img)
-    return image_data
+    return image_data, pred, text_list
