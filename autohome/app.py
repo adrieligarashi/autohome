@@ -10,8 +10,10 @@ from autohome.camera import Camera
 from autohome.image_processing import image_proc
 import numpy as np
 
-pred = np.array([0, 0, 0, 0, 0, 0, 1])
-text_list = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+pred_resume = np.array([0, 0, 0, 1])
+text_list = [
+    'Angry', 'Happy', 'Sad', 'Neutral'
+]
 
 
 
@@ -27,7 +29,7 @@ camera = Camera(webopencv())
 
 @socketio.on('input image', namespace='/test')
 def test_message(input):
-    global pred
+    global pred_resume
     global text_list
 
     input = input.split(",")[1]
@@ -36,7 +38,7 @@ def test_message(input):
     #image_data = image_data.decode("utf-8")
     #print("IMG_DATA_DECODEDE", type(image_data))
 
-    image_data, pred, text_list = image_proc(input)
+    image_data, pred_resume, text_list, text = image_proc(input)
 
     # print('IMG_DATA', type(image_data))
 
@@ -55,7 +57,7 @@ def test_connect():
 def index():
     """Video streaming home page."""
     return render_template('index.html',
-                           values=pred.tolist(),
+                           values=pred_resume.tolist(),
                            labels=text_list)
 
 
@@ -63,7 +65,7 @@ def index():
 def data():
     # response = make_response(json.dumps(pred.tolist()))
     # response.content_type = 'application/json'
-    return jsonify(result=pred.tolist())
+    return jsonify(result=pred_resume.tolist())
 
 
 def gen():
