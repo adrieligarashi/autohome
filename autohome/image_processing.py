@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from keras.models import load_model
 
+pred_passadas = np.array([np.zeros(40) for x in range(0, 7)])
 pred_mean = np.array([0, 0, 0, 0, 0, 0, 0])
 pred = np.array([0, 0, 0, 0, 0, 0, 1])
 n_mean = 1
@@ -21,6 +22,7 @@ def image_proc(input):
     global pred_mean
     global n_mean
     global pred
+    global pred_passadas
 
     open_cv_image = pil_image_to_array(input)
     open_cv_image = open_cv_image[:, :, ::-1].copy()
@@ -42,15 +44,30 @@ def image_proc(input):
                 roi = cv2.resize(fc_gray, (48, 48))
                 roi_face = cv2.resize(fc, (96, 96))
 
-                if n_mean == 5:
-                    pred = pred_mean
-                    pred_mean = pred_mean / n_mean
-                    n_mean = 1
-                else:
-                    n_mean += 1
-                    pred_mean = pred_mean + loaded_model.predict(
-                        roi_face[np.newaxis, :, :])
+                # if n_mean == 5:
+                #     pred = pred_mean
+                #     pred_mean = pred_mean / n_mean
+                #     n_mean = 1
+                # else:
+                #     n_mean += 1
+                #     pred_mean = pred_mean + loaded_model.predict(
+                #         roi_face[np.newaxis, :, :])
 
+                pred = loaded_model.predict(roi_face[np.newaxis, :, :])
+                add_pred = np.insert(pred_passadas, 0, pred, axis=1)
+                shifted_pred = np.delete(add_pred,
+                                         add_pred.shape[1] - 1,
+                                         axis=1)
+
+                pred_passadas = shifted_pred.copy()
+                pred_mean = np.mean(shifted_pred, axis=1)
+
+                pred_resume = np.array([
+                    pred_mean[0:3].max(), pred_mean[3], pred_mean[4],
+                    pred_mean[5:7].max()
+                ])
+
+                print(shifted_pred[0])
 
 
                 pred_gender = loaded_model_gender.predict(roi[np.newaxis, :, :,
@@ -60,10 +77,15 @@ def image_proc(input):
                 pred_age = loaded_model_age.predict(roi[np.newaxis, :, :,
                                                         np.newaxis])
 
-                text_idx = np.argmax(pred)
+
+
+                text_idx = np.argmax(pred_resume)
+                # text_list = [
+                #     'Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise',
+                #     'Neutral'
+                # ]
                 text_list = [
-                    'Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise',
-                    'Neutral'
+                    'Angry', 'Happy', 'Sad', 'Neutral'
                 ]
                 text_idx_gender = np.argmax(pred_gender)
                 text_list_gender = ['Men', 'Women']
@@ -136,4 +158,4 @@ def image_proc(input):
 
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     image_data = array_to_base64(img)
-    return image_data, pred, text_list
+    return image_data, pred_resume, text_list, text
