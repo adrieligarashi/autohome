@@ -132,8 +132,7 @@ class MusicPlayer(spotipy.Spotify):
 
 
 if __name__ == '__main__':
-    sp = MusicPlayer()
+    sp = MusicPlayer('Happy')
     sp.create_custom_playlist()
     sp.play_new_playlist()
-
     print('GREAT SUCCESS!')
