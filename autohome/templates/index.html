@@ -76,7 +76,7 @@
       <div>
         <canvas id="radarChart" width="900" height="400"></canvas>
         <script>
-        let resultado = [0.7130420036296845,0.6981536665334702, 0.7164640604381561, 0.7069314714794159, 0.7189062721719741, 0.7164134856424331, 0.7300250622682571]
+        let resultado = [0, 0, 0, 1]
 
           // function requestData() {
           //   var dados = $.get('/data');
@@ -141,9 +141,9 @@
 
             // var interval2 = setInterval(radarPlot, 1000);
             setInterval(function () {
-              data.datasets[0].data = resultado.result[0]
+              data.datasets[0].data = resultado.result
               radarct.update()
-              //console.log()
+              //console.log(resultado)
 
             }, 2000)
               ;
