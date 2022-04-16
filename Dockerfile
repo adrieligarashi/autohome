@@ -1,18 +1,21 @@
 FROM python:3.7
 
-WORKDIR /autohome
+# WORKDIR /webflask
 
-COPY autohome/main_site.py autohome/main_site.py
-COPY requirements.txt ./requirements.txt
+COPY . ./
 
-RUN pip install -r requirements.txt
+RUN apt-get update
+RUN apt-get install ffmpeg libsm6 libxext6  -y
+RUN pip install -r ./requirements.txt
 
-EXPOSE 8501 50057 53939 53940 53941
 
-COPY . /autohome
 
-ENTRYPOINT ["streamlit", "run", "autohome/main_site.py", "--server.port=8501", "--server.address=0.0.0.0"]
+EXPOSE 8000
+
+#ENTRYPOINT ["streamlit", "run", "autohome/main_site.py", "--server.port=8501", "--server.address=0.0.0.0"]
 
 #ENTRYPOINT ["python", "-m"]
 
-# CMD python -m http.server 8000
+# CMD gunicorn -k eventlet -b 0.0.0.0:5005 -w 1 app:app
+
+CMD gunicorn -k eventlet -w 1 autohome.app:app --log-file=-
