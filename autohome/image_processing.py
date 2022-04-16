@@ -5,6 +5,19 @@ import cv2
 import numpy as np
 from keras.models import load_model
 from keras.applications.xception import preprocess_input
+from autohome.FastMTCNN import FastMTCNN
+import torch
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+fast_mtcnn = FastMTCNN(stride=4,
+                       resize=1,
+                       margin=30,
+                       factor=0.7,
+                       keep_all=True,
+                       device=device)
+
+
 
 def get_gender(prob):
     if prob < 0.5:
@@ -33,7 +46,7 @@ loaded_model_gender = load_model('autohome/models/gender_test.hdf5')
 # loaded_model_age = load_model('autohome/models/model_age.h5')
 loaded_model_age = load_model('autohome/models/age_prediction.h5')
 
-mtcnn = MTCNN(image_size=224, margin=10, keep_all=True, min_face_size=40)
+#mtcnn = MTCNN(image_size=224, margin=10, keep_all=True, min_face_size=40)
 
 
 def image_proc(input):
@@ -48,16 +61,22 @@ def image_proc(input):
 
     img = copy.deepcopy(open_cv_image)
 
-    img_cropped_list, prob_list = mtcnn(base64_to_pil_image(input),
-                                        return_prob=True)
+    # img_cropped_list, prob_list = mtcnn(base64_to_pil_image(input),
+    #                                     return_prob=True)
 
-    if img_cropped_list is not None:
-        boxes, _ = mtcnn.detect(base64_to_pil_image(input))
-        for i, prob in enumerate(prob_list):
-            if prob > 0.80:
+    faces, boxes, probs = fast_mtcnn([img])
 
-                fc = img_cropped_list[i].permute(1, 2, 0).numpy()
+    if faces is not None:
+        #boxes, _ = mtcnn.detect(base64_to_pil_image(input))
+        for i, prob in enumerate(probs):  #enumerate(prob_list):
+            print(probs[0])
+            if prob[0] > 0.80:
+
+                #fc = faces[i].permute(1, 2, 0).numpy()
+
+                fc = faces[i]
                 fc = fc[:, :, ::-1].copy()
+
                 # fc_gray = cv2.cvtColor(fc, cv2.COLOR_BGR2GRAY)
 
                 # roi = cv2.resize(fc_gray, (48, 48))
@@ -75,8 +94,8 @@ def image_proc(input):
 
                 add_pred = np.insert(pred_passadas, 0, pred, axis=1)
                 shifted_pred = np.delete(add_pred,
-                                         add_pred.shape[1] - 1,
-                                         axis=1)
+                                            add_pred.shape[1] - 1,
+                                            axis=1)
 
                 pred_passadas = shifted_pred.copy()
                 pred_mean = np.mean(shifted_pred, axis=1)
@@ -166,7 +185,7 @@ def image_proc(input):
 
                 text_age = get_age(pred_age[0])
 
-                box = boxes[i]
+                box = boxes[0][i]
                 box = box.astype(int)
 
                 cv2.putText(img, text_gender, (box[0] - 40, box[1] + 10),
