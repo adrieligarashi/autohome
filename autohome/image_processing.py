@@ -19,10 +19,11 @@ n_mean = 1
 loaded_model = load_model('autohome/models/trained_vggface.h5')
 # loaded_model_gender = load_model('autohome/models/model_gender.h5')
 loaded_model_gender = load_model('autohome/models/gender_test.hdf5')
-loaded_model_ethiny = load_model('autohome/models/model_ethiny.h5')
+# loaded_model_ethiny = load_model('autohome/models/model_ethiny.h5')
 loaded_model_age = load_model('autohome/models/model_age.h5')
 
 mtcnn = MTCNN(image_size=240, margin=0, keep_all=True, min_face_size=40)
+
 
 def image_proc(input):
 
@@ -52,16 +53,9 @@ def image_proc(input):
                 roi_face = cv2.resize(fc, (96, 96))
                 roi_gender = cv2.resize(fc, (178, 218)) / 255.0
 
-                # if n_mean == 5:
-                #     pred = pred_mean
-                #     pred_mean = pred_mean / n_mean
-                #     n_mean = 1
-                # else:
-                #     n_mean += 1
-                #     pred_mean = pred_mean + loaded_model.predict(
-                #         roi_face[np.newaxis, :, :])
 
                 pred = loaded_model.predict(roi_face[np.newaxis, :, :])
+
                 add_pred = np.insert(pred_passadas, 0, pred, axis=1)
                 shifted_pred = np.delete(add_pred,
                                          add_pred.shape[1] - 1,
@@ -70,19 +64,19 @@ def image_proc(input):
                 pred_passadas = shifted_pred.copy()
                 pred_mean = np.mean(shifted_pred, axis=1)
 
+
                 pred_resume = np.array([
                     pred_mean[0:3].max(), pred_mean[3], pred_mean[4],
                     pred_mean[5:7].max()
                 ])
 
-                print(shifted_pred[0])
 
 
                 # pred_gender = loaded_model_gender.predict(roi[np.newaxis, :, :,
                 #                                               np.newaxis])
                 pred_gender = loaded_model_gender.predict(roi_gender[np.newaxis, :, :])
-                pred_ethiny = loaded_model_ethiny.predict(roi[np.newaxis, :, :,
-                                                              np.newaxis])
+                #pred_ethiny = loaded_model_ethiny.predict(roi[np.newaxis, :, :,
+                #                                              np.newaxis])
                 pred_age = loaded_model_age.predict(roi[np.newaxis, :, :,
                                                         np.newaxis])
 
@@ -98,10 +92,10 @@ def image_proc(input):
                 ]
                 # text_idx_gender = np.argmax(pred_gender)
                 # text_list_gender = ['Men', 'Women']
-                text_idx_ethiny = np.argmax(pred_ethiny)
-                text_list_ethiny = [
-                    'White', 'Black', 'Asian', 'Indian', 'Others'
-                ]
+                #text_idx_ethiny = np.argmax(pred_ethiny)
+                #text_list_ethiny = [
+                # 'White', 'Black', 'Asian', 'Indian', 'Others'
+                #]
                 text_idx_age = np.argmax(pred_age)
                 text_list_age = [
                     'Baby', 'Teen', 'Teenager', 'Young_Adult', 'Adult', 'Old'
@@ -129,16 +123,16 @@ def image_proc(input):
 
                 text_gender = get_gender(pred_gender[0][0])
 
-                if text_idx_ethiny == 0:
-                    text_ethiny = text_list_ethiny[0]
-                if text_idx_ethiny == 1:
-                    text_ethiny = text_list_ethiny[1]
-                elif text_idx_ethiny == 2:
-                    text_ethiny = text_list_ethiny[2]
-                elif text_idx_ethiny == 3:
-                    text_ethiny = text_list_ethiny[3]
-                elif text_idx_ethiny == 4:
-                    text_ethiny = text_list_ethiny[4]
+                # if text_idx_ethiny == 0:
+                #     text_ethiny = text_list_ethiny[0]
+                # if text_idx_ethiny == 1:
+                #     text_ethiny = text_list_ethiny[1]
+                # elif text_idx_ethiny == 2:
+                #     text_ethiny = text_list_ethiny[2]
+                # elif text_idx_ethiny == 3:
+                #     text_ethiny = text_list_ethiny[3]
+                # elif text_idx_ethiny == 4:
+                #     text_ethiny = text_list_ethiny[4]
 
                 if text_idx_age == 0:
                     text_age = text_list_age[0]
@@ -155,13 +149,13 @@ def image_proc(input):
                 box = boxes[i]
                 box = box.astype(int)
 
-                cv2.putText(img, text, (box[0] - 50, box[1]),
+                cv2.putText(img, text_gender, (box[0] - 40, box[1] + 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
-                cv2.putText(img, text_gender, (box[0] + 60, box[1]),
+                cv2.putText(img, text_age, (box[0] + 70, box[1] + 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
-                cv2.putText(img, text_ethiny, (box[2] - 100, box[3]),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
-                cv2.putText(img, text_age, (box[2] + 5, box[3] + 5),
+                # cv2.putText(img, text_ethiny, (box[2] - 100, box[3]),
+                #             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
+                cv2.putText(img, text, (box[2] - 50, box[3] + 15),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
 
                 img = cv2.rectangle(img, (box[0], box[1]), (box[2], box[3]),
