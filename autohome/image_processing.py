@@ -5,13 +5,20 @@ import cv2
 import numpy as np
 from keras.models import load_model
 
+def get_gender(prob):
+    if prob < 0.5:
+        return "Male"
+    else:
+        return "Women"
+
 pred_passadas = np.array([np.zeros(40) for x in range(0, 7)])
 pred_mean = np.array([0, 0, 0, 0, 0, 0, 0])
 pred = np.array([0, 0, 0, 0, 0, 0, 1])
 n_mean = 1
 
 loaded_model = load_model('autohome/models/trained_vggface.h5')
-loaded_model_gender = load_model('autohome/models/model_gender.h5')
+# loaded_model_gender = load_model('autohome/models/model_gender.h5')
+loaded_model_gender = load_model('autohome/models/gender_test.hdf5')
 loaded_model_ethiny = load_model('autohome/models/model_ethiny.h5')
 loaded_model_age = load_model('autohome/models/model_age.h5')
 
@@ -43,6 +50,7 @@ def image_proc(input):
 
                 roi = cv2.resize(fc_gray, (48, 48))
                 roi_face = cv2.resize(fc, (96, 96))
+                roi_gender = cv2.resize(fc, (178, 218)) / 255.0
 
                 # if n_mean == 5:
                 #     pred = pred_mean
@@ -70,8 +78,9 @@ def image_proc(input):
                 print(shifted_pred[0])
 
 
-                pred_gender = loaded_model_gender.predict(roi[np.newaxis, :, :,
-                                                              np.newaxis])
+                # pred_gender = loaded_model_gender.predict(roi[np.newaxis, :, :,
+                #                                               np.newaxis])
+                pred_gender = loaded_model_gender.predict(roi_gender[np.newaxis, :, :])
                 pred_ethiny = loaded_model_ethiny.predict(roi[np.newaxis, :, :,
                                                               np.newaxis])
                 pred_age = loaded_model_age.predict(roi[np.newaxis, :, :,
@@ -87,8 +96,8 @@ def image_proc(input):
                 text_list = [
                     'Angry', 'Happy', 'Sad', 'Neutral'
                 ]
-                text_idx_gender = np.argmax(pred_gender)
-                text_list_gender = ['Men', 'Women']
+                # text_idx_gender = np.argmax(pred_gender)
+                # text_list_gender = ['Men', 'Women']
                 text_idx_ethiny = np.argmax(pred_ethiny)
                 text_list_ethiny = [
                     'White', 'Black', 'Asian', 'Indian', 'Others'
@@ -113,10 +122,12 @@ def image_proc(input):
                 elif text_idx == 6:
                     text = text_list[6]
 
-                if text_idx_gender == 0:
-                    text_gender = text_list_gender[0]
-                elif text_idx_gender == 1:
-                    text_gender = text_list_gender[1]
+                # if text_idx_gender == 0:
+                #     text_gender = text_list_gender[0]
+                # elif text_idx_gender == 1:
+                #     text_gender = text_list_gender[1]
+
+                text_gender = get_gender(pred_gender[0][0])
 
                 if text_idx_ethiny == 0:
                     text_ethiny = text_list_ethiny[0]
