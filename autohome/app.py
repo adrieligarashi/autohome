@@ -10,6 +10,8 @@ from autohome.camera import Camera
 from autohome.image_processing import image_proc
 import numpy as np
 
+
+
 pred_resume = np.array([0, 0, 0, 1])
 text_list = [
     'Angry', 'Happy', 'Sad', 'Neutral'
