@@ -1,4 +1,4 @@
-from autohome.utils import pil_image_to_array, base64_to_pil_image, array_to_base64
+from autohome.utils import pil_image_to_array, base64_to_pil_image, array_to_base64, get_age, get_gender, get_emotion
 import copy
 from facenet_pytorch import MTCNN
 import cv2
@@ -17,22 +17,6 @@ fast_mtcnn = FastMTCNN(stride=4,
                        keep_all=True,
                        device=device)
 
-
-
-def get_gender(prob):
-    if prob < 0.5:
-        return "Male"
-    else:
-        return "Women"
-
-def get_age(distr):
-    if distr >= 0 and distr < 5:return "Baby"
-    if distr >= 5 and distr < 12:return "Child"
-    if distr >= 12 and distr < 18:return "Teenager"
-    if distr >= 18 and distr < 25:return "Young Adult"
-    if distr >= 25 and distr < 45: return "Adult"
-    if distr >= 45 and distr <= 60: return "Middle Age"
-    return "Old"
 
 pred_passadas = np.array([np.zeros(40) for x in range(0, 7)])
 pred_mean = np.array([0, 0, 0, 0, 0, 0, 0])
@@ -118,7 +102,7 @@ def image_proc(input):
                 pred_age = loaded_model_age.predict(roi_age[np.newaxis, :, :])
 
 
-                text_idx = np.argmax(pred_resume)
+                # text_idx = np.argmax(pred_resume)
                 # text_list = [
                 #     'Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise',
                 #     'Neutral'
@@ -137,20 +121,22 @@ def image_proc(input):
                 #     'Baby', 'Teen', 'Teenager', 'Young_Adult', 'Adult', 'Old'
                 # ]
 
-                if text_idx == 0:
-                    text = text_list[0]
-                if text_idx == 1:
-                    text = text_list[1]
-                elif text_idx == 2:
-                    text = text_list[2]
-                elif text_idx == 3:
-                    text = text_list[3]
-                elif text_idx == 4:
-                    text = text_list[4]
-                elif text_idx == 5:
-                    text = text_list[5]
-                elif text_idx == 6:
-                    text = text_list[6]
+                # if text_idx == 0:
+                #     text = text_list[0]
+                # if text_idx == 1:
+                #     text = text_list[1]
+                # elif text_idx == 2:
+                #     text = text_list[2]
+                # elif text_idx == 3:
+                #     text = text_list[3]
+                # elif text_idx == 4:
+                #     text = text_list[4]
+                # elif text_idx == 5:
+                #     text = text_list[5]
+                # elif text_idx == 6:
+                #     text = text_list[6]
+
+                text = get_emotion(np.argmax(pred_resume))
 
                 # if text_idx_gender == 0:
                 #     text_gender = text_list_gender[0]
