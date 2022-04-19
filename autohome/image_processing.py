@@ -1,6 +1,5 @@
-from autohome.utils import pil_image_to_array, base64_to_pil_image, array_to_base64, get_age, get_gender, get_emotion
+from autohome.utils import pil_image_to_array, array_to_base64, get_age, get_gender, get_emotion
 import copy
-from facenet_pytorch import MTCNN
 import cv2
 import numpy as np
 from keras.models import load_model
@@ -22,7 +21,7 @@ pred_passadas = np.array([np.zeros(40) for x in range(0, 7)])
 pred_mean = np.array([0, 0, 0, 0, 0, 0, 0])
 pred = np.array([0, 0, 0, 0, 0, 0, 1])
 n_mean = 1
-pred_resume = [0, 0, 0, 1]
+pred_resume = np.array([0, 0, 0, 1])
 
 loaded_model = load_model('autohome/models/trained_vggface.h5')
 # loaded_model_gender = load_model('autohome/models/model_gender.h5')
@@ -61,7 +60,7 @@ def image_proc(input):
         #boxes, _ = mtcnn.detect(base64_to_pil_image(input))
         for i, prob in enumerate(probs[0]):  #enumerate(prob_list):
 
-            if prob is not None and prob > 0.80:
+            if prob is not None and prob > 0.60:
                 #fc = faces[i].permute(1, 2, 0).numpy()
 
                 fc = faces[i]
