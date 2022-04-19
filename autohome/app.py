@@ -1,7 +1,5 @@
 from cProfile import label
-import json
 from sys import stdout
-from urllib import response
 from autohome.process import webopencv
 import logging
 from flask import Flask, render_template, Response, request, jsonify

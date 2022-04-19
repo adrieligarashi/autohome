@@ -13,7 +13,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 fast_mtcnn = FastMTCNN(stride=4,
                        resize=1,
                        margin=30,
-                       factor=0.7,
+                       factor=0.9,
                        keep_all=True,
                        device=device)
 
@@ -22,10 +22,11 @@ pred_passadas = np.array([np.zeros(40) for x in range(0, 7)])
 pred_mean = np.array([0, 0, 0, 0, 0, 0, 0])
 pred = np.array([0, 0, 0, 0, 0, 0, 1])
 n_mean = 1
+pred_resume = [0, 0, 0, 1]
 
 loaded_model = load_model('autohome/models/trained_vggface.h5')
 # loaded_model_gender = load_model('autohome/models/model_gender.h5')
-loaded_model_gender = load_model('autohome/models/gender_test.hdf5')
+loaded_model_gender = load_model('autohome/models/model_gender.h5')
 # loaded_model_ethiny = load_model('autohome/models/model_ethiny.h5')
 # loaded_model_age = load_model('autohome/models/model_age.h5')
 loaded_model_age = load_model('autohome/models/age_prediction.h5')
@@ -39,6 +40,12 @@ def image_proc(input):
     global n_mean
     global pred
     global pred_passadas
+    global pred_resume
+
+    text_list = [
+    'Angry', 'Happy', 'Sad', 'Neutral'
+    ]
+    text = 'Neutral'
 
     open_cv_image = pil_image_to_array(input)
     open_cv_image = open_cv_image[:, :, ::-1].copy()
@@ -52,10 +59,9 @@ def image_proc(input):
 
     if faces is not None:
         #boxes, _ = mtcnn.detect(base64_to_pil_image(input))
-        for i, prob in enumerate(probs):  #enumerate(prob_list):
-            print(probs[0])
-            if prob[0] > 0.80:
+        for i, prob in enumerate(probs[0]):  #enumerate(prob_list):
 
+            if prob is not None and prob > 0.80:
                 #fc = faces[i].permute(1, 2, 0).numpy()
 
                 fc = faces[i]
@@ -66,8 +72,8 @@ def image_proc(input):
                 # roi = cv2.resize(fc_gray, (48, 48))
                 roi_face = cv2.resize(fc, (96, 96))
 
-                roi_gender = cv2.resize(cv2.cvtColor(fc, cv2.COLOR_BGR2RGB),
-                                        (178, 218))
+                roi_gender = cv2.resize(cv2.cvtColor(fc, cv2.COLOR_BGR2GRAY),
+                                        (48, 48))
 
 
                 roi_age_temp = cv2.resize(fc, (224, 224))
@@ -102,73 +108,8 @@ def image_proc(input):
                 pred_age = loaded_model_age.predict(roi_age[np.newaxis, :, :])
 
 
-                # text_idx = np.argmax(pred_resume)
-                # text_list = [
-                #     'Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise',
-                #     'Neutral'
-                # ]
-                text_list = [
-                    'Angry', 'Happy', 'Sad', 'Neutral'
-                ]
-                # text_idx_gender = np.argmax(pred_gender)
-                # text_list_gender = ['Men', 'Women']
-                # text_idx_ethiny = np.argmax(pred_ethiny)
-                # text_list_ethiny = [
-                #     'White', 'Black', 'Asian', 'Indian', 'Others'
-                # ]
-                # text_idx_age = np.argmax(pred_age)
-                # text_list_age = [
-                #     'Baby', 'Teen', 'Teenager', 'Young_Adult', 'Adult', 'Old'
-                # ]
-
-                # if text_idx == 0:
-                #     text = text_list[0]
-                # if text_idx == 1:
-                #     text = text_list[1]
-                # elif text_idx == 2:
-                #     text = text_list[2]
-                # elif text_idx == 3:
-                #     text = text_list[3]
-                # elif text_idx == 4:
-                #     text = text_list[4]
-                # elif text_idx == 5:
-                #     text = text_list[5]
-                # elif text_idx == 6:
-                #     text = text_list[6]
-
                 text = get_emotion(np.argmax(pred_resume))
-
-                # if text_idx_gender == 0:
-                #     text_gender = text_list_gender[0]
-                # elif text_idx_gender == 1:
-                #     text_gender = text_list_gender[1]
-
                 text_gender = get_gender(pred_gender[0][0])
-
-                # if text_idx_ethiny == 0:
-                #     text_ethiny = text_list_ethiny[0]
-                # if text_idx_ethiny == 1:
-                #     text_ethiny = text_list_ethiny[1]
-                # elif text_idx_ethiny == 2:
-                #     text_ethiny = text_list_ethiny[2]
-                # elif text_idx_ethiny == 3:
-                #     text_ethiny = text_list_ethiny[3]
-                # elif text_idx_ethiny == 4:
-                #     text_ethiny = text_list_ethiny[4]
-
-                # if text_idx_age == 0:
-                #     text_age = text_list_age[0]
-                # if text_idx_age == 1:
-                #     text_age = text_list_age[1]
-                # elif text_idx_age == 2:
-                #     text_age = text_list_age[2]
-                # elif text_idx_age == 3:
-                #     text_age = text_list_age[3]
-                # elif text_idx_age == 4:
-                #     text_age = text_list_age[4]
-                # elif text_idx_age == 5:
-                #     text_age = text_list_age[5]
-
                 text_age = get_age(pred_age[0])
 
                 box = boxes[0][i]
