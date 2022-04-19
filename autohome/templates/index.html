@@ -38,13 +38,6 @@
         </style>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        <script type="text/javascript">
-
-
-
-
-
-        </script>
 
     </head>
     <body onload="update_values();">
@@ -58,6 +51,8 @@
         </div>
 
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+
         <script type="text/javascript">
           var $SCRIPT_ROOT = {{ request.script_root | tojson | safe }};
         </script>
@@ -85,13 +80,13 @@
           //   {
 
 
-            
+
           //     var series
 
           //   })
           // }
 
-            var intervalID = setInterval(update_values, 1000);
+            var intervalID = setInterval(update_values, 500);
 
               function update_values() {
                 $.getJSON($SCRIPT_ROOT + '/data',
@@ -148,7 +143,7 @@
               radarct.update()
               //console.log(resultado)
 
-            }, 2000)
+            }, 500)
               ;
 
         </script>
