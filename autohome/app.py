@@ -1,7 +1,5 @@
 from cProfile import label
-import json
 from sys import stdout
-from urllib import response
 from autohome.process import webopencv
 import logging
 from flask import Flask, render_template, Response, request, jsonify
@@ -58,7 +56,7 @@ def test_connect():
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return render_template('index.html',
+    return render_template('autohome.html',
                            values=pred_resume.tolist(),
                            labels=text_list)
 
