@@ -56,7 +56,7 @@ def test_connect():
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return render_template('/material-kit/autohome.html',
+    return render_template('autohome.html',
                            values=pred_resume.tolist(),
                            labels=text_list)
 
