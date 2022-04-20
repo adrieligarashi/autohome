@@ -87,7 +87,6 @@
 
           //   })
           // }
-
             var intervalID = setInterval(update_values, 1000);
 
               function update_values() {
@@ -155,6 +154,31 @@
         <script>
           document.getElementById("result").innerHTML;
         </script>
+
+        <div id="music-frame">
+          <iframe style="border-radius:12px"
+            src="https://open.spotify.com/embed/playlist/{{ playlist }}?theme=0" width="100%"
+            height="80" frameBorder="0" allowfullscreen=""
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture">
+          </iframe>
+        <script type="text/javascript">
+          // window.onload = function () {
+          //     var hangoutButton = document.getElementsByClassName("b4 ah di dj dk dl")[0];
+          //     console.log('botao');
+          //     hangoutButton.click(); // this will trigger the click event
+          //       console.log('cliquei!');
+          //     };
+          console.log('abrindo')
+          window.setTimeout(function () {
+              if (document.getElementsByClassName("b4 ah di dj dk dl")[0]) {
+                var hangoutButton = document.getElementsByClassName("b4 ah di dj dk dl")[0];
+                console.log('botao');
+                hangoutButton.click(); // this will trigger the click event
+                console.log('cliquei!');
+              }
+            }, 10000 /* but after 400 ms */);
+        </script>
+        </div>
 
     </body>
 </html>

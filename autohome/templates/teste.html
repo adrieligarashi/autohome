@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+  <iframe style="border-radius:12px" id="iframe"
+    src="https://open.spotify.com/embed/playlist/{{ playlist }}" width="100%"
+    height="80" frameBorder="0" allowfullscreen=""
+    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture">
+  </iframe>
+
+<script>
+  function autoplay() {
+
+      var t = setTimeout(function () {
+      var iframe = document.getElementById('iframe')
+      console.log(iframe)
+      // var innerDoc = iframe.querySelector('[title="Play"]')
+      var button = iframe.querySelector('[title="Play"]')
+
+      console.log(button)
+      if (button) {
+        console.log('Click', button)
+        button.click()
+      }
+    }, 999)
+  }
+</script>
+</body>
+
+</html>
