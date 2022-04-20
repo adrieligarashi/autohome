@@ -1,4 +1,5 @@
 from cProfile import label
+from distutils.log import debug
 from sys import stdout
 from autohome.process import webopencv
 import logging
@@ -56,7 +57,13 @@ def test_connect():
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return render_template('autohome.html',
+    return render_template('index.html')
+
+
+@app.route('/run')
+def run():
+    """Video streaming home page."""
+    return render_template('run.html',
                            values=pred_resume.tolist(),
                            labels=text_list)
 
@@ -86,4 +93,4 @@ def video_feed():
 
 
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, debug=True)
