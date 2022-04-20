@@ -1,7 +1,6 @@
 from cProfile import label
-import json
+from distutils.log import debug
 from sys import stdout
-from urllib import response
 from autohome.process import webopencv
 import logging
 from flask import Flask, render_template, Response, request, jsonify
@@ -10,6 +9,8 @@ from autohome.camera import Camera
 from autohome.image_processing import image_proc
 import numpy as np
 from autohome.music_player import MusicPlayer
+
+
 
 pred_resume = np.array([0, 0, 0, 1])
 text_list = [
@@ -57,7 +58,13 @@ def test_connect():
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return render_template('index.html',
+    return render_template('index.html')
+
+
+@app.route('/run')
+def run():
+    """Video streaming home page."""
+    return render_template('run.html',
                            values=pred_resume.tolist(),
                            labels=text_list)
 
@@ -87,4 +94,4 @@ def video_feed():
 
 
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, debug=True)
