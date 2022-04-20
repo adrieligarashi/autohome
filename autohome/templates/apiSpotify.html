@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+<!-- O script que realmente importa está marcado!!! -->
+
 <html>
 
 <head>
@@ -7,8 +10,11 @@
 
 <body>
   <h1>Spotify Web Playback SDK Quick Start</h1>
-  <button id="togglePlay">Play</button>
-  <script src="https://sdk.scdn.co/spotify-player.js"></script>
+
+
+  <!-- Daqui!! (Com ou sem o <button>) -->
+  <button id="togglePlay">Play/Stop</button>
+  <script src="https://sdk.scdn.co/spotify-player.js" async></script>
   <script>
     window.onSpotifyWebPlaybackSDKReady = () => {
 
@@ -16,7 +22,7 @@
       const player = new window.Spotify.Player({
         name: 'Autohome',
         getOAuthToken: cb => { cb(token); },
-        volume: 0.3
+        volume: 0.2
       });
 
       player.connect();
@@ -29,29 +35,56 @@
         console.log('Not ready', device_id);
       });
 
-      // TODO: get request the device and set to a variable
+      setTimeout(async function () {
+        const response = await fetch('https://api.spotify.com/v1/me/player/devices', {
+          method: 'GET',
+          headers: {
+            'Authorization': 'Bearer {{ token }}',
+            'Content-Type': 'application/json'
+          }
+        })
 
-      setTimeout(function(){
-        fetch('https://api.spotify.com/v1/me/player', {
+        if (response.ok) {
+          const devices = await response.json()
+          console.log(devices["devices"][0]["name"])
+          for (let i = 0; i < devices["devices"].length; i++) {
+            if ( devices["devices"][i]["name"] === "Autohome") {
+              var device =  devices["devices"][i]["id"]
+            }
+          }
+          console.log(device)
+        }
+
+        const setDevice = await fetch('https://api.spotify.com/v1/me/player', {
           method: 'PUT',
           headers: {
             'Authorization': 'Bearer {{ token }}',
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            'device_ids': [device]
+            device_ids: [device]
           })
         })
-      }, 5000)
+
+        const play = await fetch('https://api.spotify.com/v1/me/player/play', {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer {{ token }}',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            context_uri: '{{ playlist }}'
+          })
+        })
+      }, 1800)
 
       document.getElementById('togglePlay').onclick = function () {
         player.togglePlay();
       }
-      };
-
-
-
+    }
   </script>
+  <!-- Ate aqui!!!! -->
+
 
 </body>
 

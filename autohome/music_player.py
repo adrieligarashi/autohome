@@ -136,7 +136,10 @@ class MusicPlayer(spotipy.Spotify):
         This method returns the current device's ID
         '''
         if not self.device:
-            self.device = self.devices()['devices'][0]['id']
+            try:
+                self.device = self.devices()['devices'][0]['id']
+            except:
+                return None
 
         return self.device
 
