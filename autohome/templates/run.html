@@ -1,0 +1,142 @@
+{% extends "autohome_base.html" %}
+
+        {% block runhead %}
+
+        <title>AutoHome Run It !</title>
+        <style>
+         #container {
+            border: 10px #333 solid;
+            text-align:center;
+            margin:auto
+         }
+
+         #videoElement {
+            align-items: center;
+            width: 640px;
+            height: 480px;
+            display: none;
+            background-color: rgb(179, 24, 24);
+         }
+
+         #imageElement {
+            width: 640px;
+            height: 480px;
+            background-color: rgb(155, 36, 36);
+         }
+
+         #canvasElement {
+            position:relative;
+            display: inline-block;
+            width: 640px;
+            height: 480px;
+            margin: 0;
+            border: 1px solid rgb(100, 80, 170);
+            display: none;
+         }
+         #photo {
+            width: 640px;
+            height: 480px;
+            border: 1px solid rgb(255, 0, 0);
+         }
+         #radarChart {
+            width:  640px;
+            height: 480px;
+         }
+
+        </style>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        {% endblock %}
+
+
+      {% block bodyrun %}
+        <div id="container">
+            <video autoplay="true" id="videoElement"></video>
+            <canvas id="canvasElement"></canvas>
+            <img id="photo"><canvas id="radarChart"></canvas>
+
+        </div>
+
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+
+        <script type="text/javascript">
+          var $SCRIPT_ROOT = {{ request.script_root | tojson | safe }};
+        </script>
+
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+
+      <div>
+
+        <script>
+        let resultado = [0, 0, 0, 1]
+
+
+            var intervalID = setInterval(update_values, 500);
+
+              function update_values() {
+                $.getJSON($SCRIPT_ROOT + '/data',
+
+                  function (data) {
+                    resultado = data
+
+                  });
+
+              };
+
+
+
+
+            const data = {
+                labels: {{ labels | safe }},
+                datasets: [{
+                  label: 'Sentimentos',
+                  data: resultado,
+                  fill: true,
+                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                  borderColor: 'rgb(255, 99, 132)',
+                  pointBackgroundColor: 'rgb(255, 99, 132)',
+                  pointBorderColor: '#fff',
+                  pointHoverBackgroundColor: '#fff',
+                  pointHoverBorderColor: 'rgb(255, 99, 132)'
+                }]
+              };
+
+            var ctx2 = document.getElementById("radarChart").getContext("2d")
+
+
+            var radarct = new Chart(ctx2, {
+              type: 'radar',
+              data: data,
+              options: {
+                responsive: false,
+                elements: {
+                  line: {
+                    borderWidth: 3
+                  }
+                }
+              },
+            })
+
+
+            setInterval(function () {
+              data.datasets[0].data = resultado.result
+              radarct.update()
+              //console.log(resultado)
+
+            }, 500)
+              ;
+
+        </script>
+      </div>
+
+        <span id="result"></span>
+        <script>
+          document.getElementById("result").innerHTML;
+        </script>
+
+    {% endblock %}
