@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>KILL ME</title>
+</head>
+
+<body>
+  <h1>Spotify Web Playback SDK Quick Start</h1>
+  <button id="togglePlay">Play</button>
+  <script src="https://sdk.scdn.co/spotify-player.js"></script>
+  <script>
+    window.onSpotifyWebPlaybackSDKReady = () => {
+
+      const token = '{{ token }}'
+      const player = new window.Spotify.Player({
+        name: 'Autohome',
+        getOAuthToken: cb => { cb(token); },
+        volume: 0.3
+      });
+
+      player.connect();
+
+      player.addListener('ready', ({ device_id }) => {
+        console.log('Ready', device_id);
+      });
+
+      player.addListener('not_ready', ({ device_id }) => {
+        console.log('Not ready', device_id);
+      });
+
+      // TODO: get request the device and set to a variable
+
+      setTimeout(function(){
+        fetch('https://api.spotify.com/v1/me/player', {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer {{ token }}',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            'device_ids': [device]
+          })
+        })
+      }, 5000)
+
+      document.getElementById('togglePlay').onclick = function () {
+        player.togglePlay();
+      }
+      };
+
+
+
+  </script>
+
+</body>
+
+</html>
