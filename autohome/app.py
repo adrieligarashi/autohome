@@ -8,6 +8,7 @@ from flask_socketio import SocketIO, emit
 from autohome.camera import Camera
 from autohome.image_processing import image_proc
 import numpy as np
+from autohome.music_player import MusicPlayer
 
 
 
