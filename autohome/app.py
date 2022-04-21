@@ -1,5 +1,6 @@
 from cProfile import label
 from distutils.log import debug
+from email import feedparser
 from sys import stdout
 from autohome.process import webopencv
 import logging
@@ -17,8 +18,12 @@ text_list = [
     'Angry', 'Happy', 'Sad', 'Neutral'
 ]
 text = ''
-felling_spotofy = '?'
+felling_spotofy = 'neutral'
 na_casa = 0
+
+sp = MusicPlayer(mood=felling_spotofy)
+uri, _ = sp.create_custom_playlist()
+token = sp.auth.get_cached_token()['access_token']
 
 app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler(stdout))
@@ -28,16 +33,14 @@ socketio = SocketIO(app)
 camera = Camera(webopencv())
 
 
-
-
-
-
 @socketio.on('input image', namespace='/test')
 def test_message(input):
     global pred_resume
     global text_list
     global text
     global felling_spotofy, na_casa
+    global uri
+    global token
 
     input = input.split(",")[1]
     camera.enqueue_input(input)
@@ -51,6 +54,9 @@ def test_message(input):
         na_casa = 0
         print(felling_spotofy)
 
+        sp = MusicPlayer(mood=felling_spotofy)
+        uri, _ = sp.create_custom_playlist()
+        token = sp.auth.get_cached_token()['access_token']
 
     # print('IMG_DATA', type(image_data))
 
@@ -75,6 +81,8 @@ def index():
 def run():
     global na_casa
     global felling_spotofy
+    global uri
+    global token
 
     if request.method == 'POST':
         na_casa = int(request.form.get('botaocasa'))
@@ -83,7 +91,9 @@ def run():
     return render_template('run.html',
                         values=pred_resume.tolist(),
                         labels=text_list,
-                        felling_spotofy = felling_spotofy)
+                        felling_spotofy = felling_spotofy,
+                        playlist=uri,
+                        token=token)
 
 
 @app.route('/data', methods=['GET'])
