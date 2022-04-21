@@ -6,7 +6,7 @@ app = Flask(__name__)
 mood = 'angry'
 
 sp = MusicPlayer(mood=mood)
-uri, url = sp.create_custom_playlist()
+uri, _ = sp.create_custom_playlist()
 token = sp.auth.get_cached_token()['access_token']
 
 
