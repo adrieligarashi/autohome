@@ -15,7 +15,7 @@ pred_resume = np.array([0, 0, 0, 1])
 text_list = [
     'Angry', 'Happy', 'Sad', 'Neutral'
 ]
-
+text = ''
 
 
 app = Flask(__name__)
@@ -32,6 +32,7 @@ camera = Camera(webopencv())
 def test_message(input):
     global pred_resume
     global text_list
+    global text
 
     input = input.split(",")[1]
     camera.enqueue_input(input)
@@ -60,12 +61,14 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/run')
+@app.route('/run', methods=['GET', 'POST'])
 def run():
-    """Video streaming home page."""
+    if request.method == 'POST':
+        print(request.form.get('botaocasa'))
+
     return render_template('run.html',
-                           values=pred_resume.tolist(),
-                           labels=text_list)
+                        values=pred_resume.tolist(),
+                        labels=text_list)
 
 
 @app.route('/data', methods=['GET'])

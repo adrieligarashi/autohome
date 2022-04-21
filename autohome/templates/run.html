@@ -7,18 +7,11 @@
          #container {
             border: 10px #333 solid;
             width: 100%;
+            text-align: center;
          }
 
          #videoElement {
-            align-items: center;
-            width: 640px;
-            height: 480px;
             display: none;
-         }
-
-         #imageElement {
-            width: 640px;
-            height: 480px;
          }
 
          #canvasElement {
@@ -26,21 +19,21 @@
          }
 
          #photo {
-            height: 100%;
+            width: 100%;
          }
          #radarChart {
-            height: 50%;
+            width: 150%;
+            text-align: center;
          }
 
          #div_photo {
-            width: 50%;
-            height: 300px;
-            float:left;
+          display: inline-block;
+          vertical-align: middle;
+          width: 70%;
 }
          #div_radar {
-            width: 50%;
-            /* height: 300px; */
-            margin: 0 auto;
+          display: inline-block;
+          vertical-align: middle;
 }
         </style>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -49,9 +42,25 @@
 
 
       {% block bodyrun %}
+
+          <div class="container py-3 mt-3">
+            <div class="row">
+              <div class="mx-left">
+                <div class="form-check form-switch ps-0">
+                  <form method="post" action="/run">
+                  <input class="form-check-input ms-auto mt-1" type="checkbox" id="flexSwitchCheckDefault" name="botaocasa" value="1">
+                  <label class="form-check-label ms-2" for="flexSwitchCheckDefault">Cheguei !</label>
+                  <input type="submit">
+                  </form>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
         <div id="container">
             <video autoplay="true" id="videoElement"></video>
-            <canvas id="canvasElement"></canvas>
+            <canvas id="canvasElement" display: none></canvas>
             <div id="div_photo"><img id="photo"></div>
             <div id="div_radar"><canvas id="radarChart"></canvas></div>
         </div>

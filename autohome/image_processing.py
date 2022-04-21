@@ -87,6 +87,7 @@ def image_proc(input):
                                             axis=1)
 
                 pred_passadas = shifted_pred.copy()
+                # print(pred_passadas)
                 pred_mean = np.mean(shifted_pred, axis=1)
 
 
