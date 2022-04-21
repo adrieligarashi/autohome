@@ -150,4 +150,74 @@
           document.getElementById("result").innerHTML;
         </script>
 
+        <script src="https://sdk.scdn.co/spotify-player.js" async></script>
+        <script>
+          window.onSpotifyWebPlaybackSDKReady = () => {
+
+            const token = '{{ token }}'
+            const player = new window.Spotify.Player({
+              name: 'Autohome',
+              getOAuthToken: cb => { cb(token); },
+              volume: 0.2
+            });
+
+            player.connect();
+
+            player.addListener('ready', ({ device_id }) => {
+              console.log('Ready', device_id);
+            });
+
+            player.addListener('not_ready', ({ device_id }) => {
+              console.log('Not ready', device_id);
+            });
+
+            setTimeout(async function () {
+              const response = await fetch('https://api.spotify.com/v1/me/player/devices', {
+                method: 'GET',
+                headers: {
+                  'Authorization': 'Bearer {{ token }}',
+                  'Content-Type': 'application/json'
+                }
+              })
+
+              if (response.ok) {
+                const devices = await response.json()
+                console.log(devices["devices"][0]["name"])
+                for (let i = 0; i < devices["devices"].length; i++) {
+                  if (devices["devices"][i]["name"] === "Autohome") {
+                    var device = devices["devices"][i]["id"]
+                  }
+                }
+                console.log(device)
+              }
+
+              const setDevice = await fetch('https://api.spotify.com/v1/me/player', {
+                method: 'PUT',
+                headers: {
+                  'Authorization': 'Bearer {{ token }}',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  device_ids: [device]
+                })
+              })
+
+              const play = await fetch('https://api.spotify.com/v1/me/player/play', {
+                method: 'PUT',
+                headers: {
+                  'Authorization': 'Bearer {{ token }}',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  context_uri: '{{ playlist }}'
+                })
+              })
+            }, 1800)
+
+            // document.getElementById('togglePlay').onclick = function () {
+            //   player.togglePlay();
+            // }
+          }
+        </script>
+
     {% endblock %}
