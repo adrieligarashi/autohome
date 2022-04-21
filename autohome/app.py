@@ -16,7 +16,8 @@ text_list = [
     'Angry', 'Happy', 'Sad', 'Neutral'
 ]
 text = ''
-
+felling_spotofy = '?'
+na_casa = 0
 
 app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler(stdout))
@@ -28,11 +29,14 @@ camera = Camera(webopencv())
 
 
 
+
+
 @socketio.on('input image', namespace='/test')
 def test_message(input):
     global pred_resume
     global text_list
     global text
+    global felling_spotofy, na_casa
 
     input = input.split(",")[1]
     camera.enqueue_input(input)
@@ -41,6 +45,11 @@ def test_message(input):
     #print("IMG_DATA_DECODEDE", type(image_data))
 
     image_data, pred_resume, text_list, text = image_proc(input)
+    if na_casa == 1:
+        felling_spotofy = text
+        na_casa = 0
+        print(felling_spotofy)
+
 
     # print('IMG_DATA', type(image_data))
 
@@ -63,12 +72,17 @@ def index():
 
 @app.route('/run', methods=['GET', 'POST'])
 def run():
+    global na_casa
+    global felling_spotofy
+
     if request.method == 'POST':
-        print(request.form.get('botaocasa'))
+        na_casa = int(request.form.get('botaocasa'))
+        print(na_casa, type(na_casa))
 
     return render_template('run.html',
                         values=pred_resume.tolist(),
-                        labels=text_list)
+                        labels=text_list,
+                        felling_spotofy = felling_spotofy)
 
 
 @app.route('/data', methods=['GET'])

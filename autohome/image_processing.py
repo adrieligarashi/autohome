@@ -17,7 +17,7 @@ fast_mtcnn = FastMTCNN(stride=4,
                        device=device)
 
 
-pred_passadas = np.array([np.zeros(40) for x in range(0, 7)])
+pred_passadas = np.array([np.zeros(20) for x in range(0, 7)])
 pred_mean = np.array([0, 0, 0, 0, 0, 0, 0])
 pred = np.array([0, 0, 0, 0, 0, 0, 1])
 n_mean = 1
