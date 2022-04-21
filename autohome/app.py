@@ -15,8 +15,9 @@ pred_resume = np.array([0, 0, 0, 1])
 text_list = [
     'Angry', 'Happy', 'Sad', 'Neutral'
 ]
-
-
+text = ''
+felling_spotofy = '?'
+na_casa = 0
 
 app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler(stdout))
@@ -28,10 +29,14 @@ camera = Camera(webopencv())
 
 
 
+
+
 @socketio.on('input image', namespace='/test')
 def test_message(input):
     global pred_resume
     global text_list
+    global text
+    global felling_spotofy, na_casa
 
     input = input.split(",")[1]
     camera.enqueue_input(input)
@@ -40,6 +45,11 @@ def test_message(input):
     #print("IMG_DATA_DECODEDE", type(image_data))
 
     image_data, pred_resume, text_list, text = image_proc(input)
+    if na_casa == 1:
+        felling_spotofy = text
+        na_casa = 0
+        print(felling_spotofy)
+
 
     # print('IMG_DATA', type(image_data))
 
@@ -60,12 +70,19 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/run')
+@app.route('/run', methods=['GET', 'POST'])
 def run():
-    """Video streaming home page."""
+    global na_casa
+    global felling_spotofy
+
+    if request.method == 'POST':
+        na_casa = int(request.form.get('botaocasa'))
+        print(na_casa, type(na_casa))
+
     return render_template('run.html',
-                           values=pred_resume.tolist(),
-                           labels=text_list)
+                        values=pred_resume.tolist(),
+                        labels=text_list,
+                        felling_spotofy = felling_spotofy)
 
 
 @app.route('/data', methods=['GET'])
