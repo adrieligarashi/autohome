@@ -5,7 +5,6 @@ $(document).ready(function(){
   let ctx = canvas.getContext('2d');
   photo = document.getElementById('photo');
   var localMediaStream = null;
-  var fr = 0
 
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
