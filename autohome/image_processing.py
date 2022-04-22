@@ -12,16 +12,16 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 fast_mtcnn = FastMTCNN(stride=4,
                        resize=1,
                        margin=30,
-                       factor=0.9,
+                       factor=0.8,
                        keep_all=True,
                        device=device)
 
 
-pred_passadas = np.array([np.zeros(20) for x in range(0, 7)])
+pred_passadas = np.array([np.zeros(10) for x in range(0, 7)])
 pred_mean = np.array([0, 0, 0, 0, 0, 0, 0])
-pred = np.array([0, 0, 0, 0, 0, 0, 1])
+pred = np.array([0, 0, 0, 0, 0, 0, 0.1])
 n_mean = 1
-pred_resume = np.array([0, 0, 0, 1])
+pred_resume = np.array([0, 0, 0, 0.1])
 
 loaded_model = load_model('autohome/models/trained_vggface.h5')
 # loaded_model_gender = load_model('autohome/models/model_gender.h5')
@@ -93,8 +93,10 @@ def image_proc(input):
 
                 pred_resume = np.array([
                     pred_mean[0:3].max(), pred_mean[3], pred_mean[4],
-                    pred_mean[5:7].max()
+                    pred_mean[6:7].max()
                 ])
+
+                print(pred_resume)
 
 
 
