@@ -45,19 +45,17 @@
 
           <div class="container py-3 mt-3">
             <div class="row">
-              <div class="mx-left">
-                <div class="form-check form-switch ps-0">
+              <div class="mx-left" style="width: 100%; overflow: hidden;">
+                <div class="form-check form-switch ps-0" style="width: 600px; float: left;">
                   <form method="post" action="/run">
                   <input class="form-check-input ms-auto mt-1" type="checkbox" id="flexSwitchCheckDefault" name="botaocasa" value="1">
                   <label class="form-check-label ms-2" for="flexSwitchCheckDefault">Cheguei !</label>
                   <input type="submit">
-                  <p>Seu estado é {{ felling_spotofy | safe }}</p>
                   </form>
-
                 </div>
-
+                <div style="margin-left: 620px;"> <h2>Seu estado é {{ felling_spotify | safe }} </h2>
+                </div>
               </div>
-
             </div>
           </div>
 
@@ -84,7 +82,7 @@
       <div>
 
         <script>
-        let resultado = [0, 0, 0, 1]
+        let resultado = [0, 0, 0, 0.1]
 
 
             var intervalID = setInterval(update_values, 500);

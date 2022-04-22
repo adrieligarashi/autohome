@@ -1,6 +1,5 @@
 from cProfile import label
 from distutils.log import debug
-from email import feedparser
 from sys import stdout
 from autohome.process import webopencv
 import logging
@@ -13,17 +12,17 @@ from autohome.music_player import MusicPlayer
 
 
 
-pred_resume = np.array([0, 0, 0, 1])
+pred_resume = np.array([0, 0, 0, 0.1])
 text_list = [
     'Angry', 'Happy', 'Sad', 'Neutral'
 ]
 text = ''
-felling_spotofy = 'neutral'
+felling_spotify = '?'
 na_casa = 0
 
-sp = MusicPlayer(mood=felling_spotofy)
-uri, _ = sp.create_custom_playlist()
-token = sp.auth.get_cached_token()['access_token']
+sp = ''
+uri = ''
+token = ''
 
 app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler(stdout))
@@ -38,32 +37,16 @@ def test_message(input):
     global pred_resume
     global text_list
     global text
-    global felling_spotofy, na_casa
-    global uri
-    global token
 
     input = input.split(",")[1]
     camera.enqueue_input(input)
-    #image_data = input  # Do your magical Image processing here!!
-    #image_data = image_data.decode("utf-8")
-    #print("IMG_DATA_DECODEDE", type(image_data))
 
     image_data, pred_resume, text_list, text = image_proc(input)
-    if na_casa == 1:
-        felling_spotofy = text
-        na_casa = 0
-        print(felling_spotofy)
 
-        sp = MusicPlayer(mood=felling_spotofy)
-        uri, _ = sp.create_custom_playlist()
-        token = sp.auth.get_cached_token()['access_token']
-
-    # print('IMG_DATA', type(image_data))
 
     image_data = "data:image/jpeg;base64," + image_data
-    # print("OUTPUT " + image_data)
     emit('out-image-event', {'image_data': image_data}, namespace='/test')
-    #camera.enqueue_input(base64_to_pil_image(input))
+
 
 
 @socketio.on('connect', namespace='/test')
@@ -80,26 +63,31 @@ def index():
 @app.route('/run', methods=['GET', 'POST'])
 def run():
     global na_casa
-    global felling_spotofy
+    global felling_spotify
     global uri
-    global token
+    global token, text, sp
 
     if request.method == 'POST':
-        na_casa = int(request.form.get('botaocasa'))
+        na_casa = request.form.get('botaocasa')
         print(na_casa, type(na_casa))
+
+        if na_casa == '1':
+            felling_spotify = text
+            sp = MusicPlayer(mood=felling_spotify)
+            uri, _ = sp.create_custom_playlist()
+            token = sp.auth.get_cached_token()['access_token']
+            na_casa = 0
 
     return render_template('run.html',
                         values=pred_resume.tolist(),
                         labels=text_list,
-                        felling_spotofy = felling_spotofy,
+                        felling_spotify = felling_spotify,
                         playlist=uri,
                         token=token)
 
 
 @app.route('/data', methods=['GET'])
 def data():
-    # response = make_response(json.dumps(pred.tolist()))
-    # response.content_type = 'application/json'
     return jsonify(result=pred_resume.tolist())
 
 
@@ -108,7 +96,7 @@ def gen():
 
     app.logger.info("starting to generate frames!")
     while True:
-        frame = camera.get_frame()  #pil_image_to_base64(camera.get_frame())
+        frame = camera.get_frame()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
