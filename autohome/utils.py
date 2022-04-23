@@ -55,13 +55,16 @@ def load_model_recognition():
 def load_saves():
     marcos = np.load(r'autohome/models/marcos.npy')
     adriel = np.load(r'autohome/models/adriel.npy')
-    return marcos, adriel
+    vitor = np.load(r'autohome/models/vitor.npy')
+    return marcos, adriel, vitor
 
-def recognition(pred_recognition, marcos, adriel):
+def recognition(pred_recognition, marcos, adriel, vitor):
     if cosine(pred_recognition, marcos) < 0.4:
         text = 'Marcos'
     elif cosine(pred_recognition, adriel) < 0.4:
         text = 'Adriel'
+    elif cosine(pred_recognition, vitor) < 0.4:
+        text = 'Vitor'
     else:
         text = 'Unknown'
     return text
