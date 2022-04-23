@@ -34,7 +34,6 @@ loaded_model_gender = load_model('autohome/models/model_gender.h5')
 # loaded_model_age = load_model('autohome/models/model_age.h5')
 loaded_model_age = load_model('autohome/models/age_prediction.h5')
 model_recognition = load_model_recognition()
-
 #mtcnn = MTCNN(image_size=224, margin=10, keep_all=True, min_face_size=40)
 
 
@@ -50,6 +49,7 @@ def image_proc(input):
     'Angry', 'Happy', 'Sad', 'Neutral'
     ]
     text = 'Neutral'
+    text_recognition = 'Unknown'
 
     open_cv_image = pil_image_to_array(input)
     open_cv_image = open_cv_image[:, :, ::-1].copy()
@@ -61,75 +61,73 @@ def image_proc(input):
 
     faces, boxes, probs = fast_mtcnn([img])
 
-    if faces is not None:
+    if faces is not None and type(faces) is not type(None):
 
         #boxes, _ = mtcnn.detect(base64_to_pil_image(input))
         for i, prob in enumerate(probs[0]):  #enumerate(prob_list):
-            if(type(faces[i]) == type(None)):
-                pass
-            else:
-                if prob is not None and prob > 0.60:
-                    #fc = faces[i].permute(1, 2, 0).numpy()
+            if prob is not None and prob > 0.60 and type(
+                    faces[i]) is not type(None):
+                #fc = faces[i].permute(1, 2, 0).numpy()
 
-                    fc = faces[i]
-                    fc = fc[:, :, ::-1].copy()
+                fc = faces[i]
+                fc = fc[:, :, ::-1].copy()
 
-                    roi_face = cv2.resize(fc, (96, 96))
-                    roi_gender = cv2.resize(cv2.cvtColor(fc, cv2.COLOR_BGR2GRAY),
-                                            (48, 48))
+                roi_face = cv2.resize(fc, (96, 96))
+                roi_gender = cv2.resize(cv2.cvtColor(fc, cv2.COLOR_BGR2GRAY),
+                                        (48, 48))
 
-                    roi_age_temp = cv2.resize(fc, (224, 224))
-                    roi_age = preprocess_input(roi_age_temp)
+                roi_age_temp = cv2.resize(fc, (224, 224))
+                roi_age = preprocess_input(roi_age_temp)
 
-                    roi_recognition = cv2.resize(fc, (160, 160))
-                    roi_recognition_new = preprocess_input(roi_recognition[np.newaxis, :, :])
+                roi_recognition = cv2.resize(fc, (160, 160))
+                roi_recognition_new = preprocess_input(roi_recognition[np.newaxis, :, :])
 
 
-                    pred = loaded_model.predict(roi_face[np.newaxis, :, :])
+                pred = loaded_model.predict(roi_face[np.newaxis, :, :])
 
-                    add_pred = np.insert(pred_passadas, 0, pred, axis=1)
-                    shifted_pred = np.delete(add_pred,
-                                                add_pred.shape[1] - 1,
-                                                axis=1)
+                add_pred = np.insert(pred_passadas, 0, pred, axis=1)
+                shifted_pred = np.delete(add_pred,
+                                            add_pred.shape[1] - 1,
+                                            axis=1)
 
-                    pred_passadas = shifted_pred.copy()
-                    # print(pred_passadas)
-                    pred_mean = np.mean(shifted_pred, axis=1)
-
-
-                    pred_resume = np.array([
-                        pred_mean[0:3].max(), pred_mean[3], pred_mean[4],
-                        pred_mean[6:7].max()
-                    ])
-
-                    # print(pred_resume)
-
-                    pred_gender = loaded_model_gender.predict(roi_gender[np.newaxis, :, :])
-                    pred_age = loaded_model_age.predict(roi_age[np.newaxis, :, :])
-                    pred_recognition = model_recognition.predict(roi_recognition_new)
+                pred_passadas = shifted_pred.copy()
+                # print(pred_passadas)
+                pred_mean = np.mean(shifted_pred, axis=1)
 
 
-                    text = get_emotion(np.argmax(pred_resume))
-                    text_gender = get_gender(pred_gender[0][0])
-                    text_age = get_age(pred_age[0])
-                    text_recognition = recognition(pred_recognition[0], marcos, adriel, vitor)
+                pred_resume = np.array([
+                    pred_mean[0:3].max(), pred_mean[3], pred_mean[4],
+                    pred_mean[6:7].max()
+                ])
+
+                # print(pred_resume)
+
+                pred_gender = loaded_model_gender.predict(roi_gender[np.newaxis, :, :])
+                pred_age = loaded_model_age.predict(roi_age[np.newaxis, :, :])
+                pred_recognition = model_recognition.predict(roi_recognition_new)
 
 
-                    box = boxes[0][i]
-                    box = box.astype(int)
+                text = get_emotion(np.argmax(pred_resume))
+                text_gender = get_gender(pred_gender[0][0])
+                text_age = get_age(pred_age[0])
+                text_recognition = recognition(pred_recognition[0], marcos, adriel, vitor)
 
-                    cv2.putText(img, text_gender, (box[0] - 40, box[1] + 10),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
-                    cv2.putText(img, text_age, (box[0] + 70, box[1] + 10),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
-                    cv2.putText(img, text_recognition, (box[2] - 40, box[3] + 10),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
-                    cv2.putText(img, text, (box[2] - 40, box[3] + 10),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
 
-                    img = cv2.rectangle(img, (box[0], box[1]), (box[2], box[3]),
-                                        (255, 0, 0), 2)
+                box = boxes[0][i]
+                box = box.astype(int)
+
+                cv2.putText(img, text_gender, (box[0] - 40, box[1] + 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
+                cv2.putText(img, text_age, (box[0] + 70, box[1] + 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
+                cv2.putText(img, text_recognition, (box[2] - 100, box[3] + 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
+                cv2.putText(img, text, (box[2] + 20, box[3] + 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
+
+                img = cv2.rectangle(img, (box[0], box[1]), (box[2], box[3]),
+                                    (255, 0, 0), 2)
 
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     image_data = array_to_base64(img)
-    return image_data, pred_resume, text_list, text
+    return image_data, pred_resume, text_list, text, text_recognition
