@@ -39,6 +39,6 @@ class FastMTCNN(object):
                 continue
             for box in boxes[box_ind]:
                 box = [int(b) for b in box]
-                faces.append(frame[box[1]-20:box[3]+20, box[0]-30:box[2]+30])
+                faces.append(frame[box[1]:box[3], box[0]:box[2]])
 
         return faces, boxes, probs
