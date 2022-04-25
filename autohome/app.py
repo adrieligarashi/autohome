@@ -9,7 +9,26 @@ from autohome.camera import Camera
 from autohome.image_processing import image_proc
 import numpy as np
 from autohome.music_player import MusicPlayer
+from autohome.mqtt import mqtt_publish
 
+
+client = mqtt_publish.connect_mqtt()
+client.loop_start()
+
+
+
+pred_resume = np.array([0, 0, 0, 0.1])
+text_list = [
+    'Angry', 'Happy', 'Sad', 'Neutral'
+]
+text = ''
+felling_spotify = '?'
+text_recognition = '?'
+na_casa = 0
+
+sp = ''
+uri = ''
+token = ''
 
 
 pred_resume = np.array([0, 0, 0, 0.1])
@@ -36,12 +55,15 @@ camera = Camera(webopencv())
 def test_message(input):
     global pred_resume
     global text_list
-    global text
+    global text, text_recognition
+
 
     input = input.split(",")[1]
     camera.enqueue_input(input)
 
-    image_data, pred_resume, text_list, text = image_proc(input)
+    image_data, pred_resume, text_list, text, text_recognition = image_proc(
+        input)
+
 
 
     image_data = "data:image/jpeg;base64," + image_data
@@ -65,7 +87,8 @@ def run():
     global na_casa
     global felling_spotify
     global uri
-    global token, text, sp
+    global token, text, sp, text_recognition
+
 
     if request.method == 'POST':
         na_casa = request.form.get('botaocasa')
@@ -76,6 +99,10 @@ def run():
             sp = MusicPlayer(mood=felling_spotify)
             uri, _ = sp.create_custom_playlist()
             token = sp.auth.get_cached_token()['access_token']
+            mqtt_publish.publish(client,
+                                 topic='le_wagon_769',
+                                 msg=f"{felling_spotify}, {text_recognition}")
+
             na_casa = 0
 
     return render_template('run.html',
@@ -83,7 +110,9 @@ def run():
                         labels=text_list,
                         felling_spotify = felling_spotify,
                         playlist=uri,
-                        token=token)
+                        token=token,
+                        text_recognition=text_recognition)
+
 
 
 @app.route('/data', methods=['GET'])

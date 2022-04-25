@@ -35,8 +35,6 @@ loaded_model_gender = load_model('autohome/models/model_gender.h5')
 loaded_model_age = load_model('autohome/models/age_prediction.h5')
 model_recognition = load_model_recognition()
 
-#mtcnn = MTCNN(image_size=224, margin=10, keep_all=True, min_face_size=40)
-
 
 def image_proc(input):
 
@@ -50,6 +48,7 @@ def image_proc(input):
     'Angry', 'Happy', 'Sad', 'Neutral'
     ]
     text = 'Neutral'
+    text_recognition = 'Unknown'
 
     open_cv_image = pil_image_to_array(input)
     open_cv_image = open_cv_image[:, :, ::-1].copy()
@@ -61,12 +60,14 @@ def image_proc(input):
 
     faces, boxes, probs = fast_mtcnn([img])
 
-    if faces is not None:
+    if faces is not None and type(faces) is not type(None):
+
         #boxes, _ = mtcnn.detect(base64_to_pil_image(input))
         for i, prob in enumerate(probs[0]):  #enumerate(prob_list):
-
-            if prob is not None and prob > 0.60:
+            if prob is not None and prob > 0.60 and type(
+                    faces[i]) is not type(None):
                 #fc = faces[i].permute(1, 2, 0).numpy()
+
 
                 fc = faces[i]
                 fc = fc[:, :, ::-1].copy()
@@ -119,9 +120,10 @@ def image_proc(input):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
                 cv2.putText(img, text_age, (box[0] + 70, box[1] + 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
-                cv2.putText(img, text_recognition, (box[2] - 40, box[3] + 10),
+                cv2.putText(img, text_recognition, (box[2] - 100, box[3] + 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
-                cv2.putText(img, text, (box[2] - 40, box[3] + 10),
+                cv2.putText(img, text, (box[2] + 20, box[3] + 10),
+
                             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
 
                 img = cv2.rectangle(img, (box[0], box[1]), (box[2], box[3]),
@@ -129,4 +131,5 @@ def image_proc(input):
 
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     image_data = array_to_base64(img)
-    return image_data, pred_resume, text_list, text
+    return image_data, pred_resume, text_list, text, text_recognition
+
