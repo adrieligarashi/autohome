@@ -11,6 +11,7 @@ import numpy as np
 from autohome.music_player import MusicPlayer
 from autohome.mqtt import mqtt_publish
 
+
 client = mqtt_publish.connect_mqtt()
 client.loop_start()
 
@@ -23,6 +24,19 @@ text_list = [
 text = ''
 felling_spotify = '?'
 text_recognition = '?'
+na_casa = 0
+
+sp = ''
+uri = ''
+token = ''
+
+
+pred_resume = np.array([0, 0, 0, 0.1])
+text_list = [
+    'Angry', 'Happy', 'Sad', 'Neutral'
+]
+text = ''
+felling_spotify = '?'
 na_casa = 0
 
 sp = ''
@@ -43,11 +57,13 @@ def test_message(input):
     global text_list
     global text, text_recognition
 
+
     input = input.split(",")[1]
     camera.enqueue_input(input)
 
     image_data, pred_resume, text_list, text, text_recognition = image_proc(
         input)
+
 
 
     image_data = "data:image/jpeg;base64," + image_data
@@ -73,6 +89,7 @@ def run():
     global uri
     global token, text, sp, text_recognition
 
+
     if request.method == 'POST':
         na_casa = request.form.get('botaocasa')
         print(na_casa, type(na_casa))
@@ -85,6 +102,7 @@ def run():
             mqtt_publish.publish(client,
                                  topic='le_wagon_769',
                                  msg=f"{felling_spotify}, {text_recognition}")
+
             na_casa = 0
 
     return render_template('run.html',
@@ -94,6 +112,7 @@ def run():
                         playlist=uri,
                         token=token,
                         text_recognition=text_recognition)
+
 
 
 @app.route('/data', methods=['GET'])
