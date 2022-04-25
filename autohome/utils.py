@@ -50,6 +50,7 @@ def get_emotion(emotion):
 def load_model_recognition():
     model = Facenet.InceptionResNetV2(dimension = 512)
     model.load_weights('./autohome/models/facenet512_weights.h5')
+
     return model
 
 def load_saves():
