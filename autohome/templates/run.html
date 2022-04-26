@@ -86,7 +86,7 @@
         let resultado = [0, 0, 0, 0.1]
 
 
-            var intervalID = setInterval(update_values, 500);
+            var intervalID = setInterval(update_values, 1000);
 
               function update_values() {
                 $.getJSON($SCRIPT_ROOT + '/data',
@@ -138,7 +138,7 @@
               radarct.update()
               //console.log(resultado)
 
-            }, 500)
+            }, 1000)
               ;
 
         </script>

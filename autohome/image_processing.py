@@ -6,13 +6,12 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from keras.applications.xception import preprocess_input
 from autohome.FastMTCNN import FastMTCNN
-import torch
 
 
 marcos, adriel, vitor = load_saves()
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
+# device = 'cuda' if torch.cuda.is_available() else 'cpu'
+device = 'cpu'
 fast_mtcnn = FastMTCNN(stride=4,
                        resize=1,
                        margin=30,
