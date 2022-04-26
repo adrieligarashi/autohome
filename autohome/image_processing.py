@@ -1,11 +1,15 @@
-from autohome.utils import pil_image_to_array, array_to_base64, get_age, get_gender, get_emotion
+from autohome.utils import pil_image_to_array, array_to_base64, get_age, get_gender, get_emotion,\
+    load_model_recognition, load_saves, recognition
 import copy
 import cv2
 import numpy as np
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 from keras.applications.xception import preprocess_input
 from autohome.FastMTCNN import FastMTCNN
 import torch
+
+
+marcos, adriel, vitor = load_saves()
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -29,8 +33,7 @@ loaded_model_gender = load_model('autohome/models/model_gender.h5')
 # loaded_model_ethiny = load_model('autohome/models/model_ethiny.h5')
 # loaded_model_age = load_model('autohome/models/model_age.h5')
 loaded_model_age = load_model('autohome/models/age_prediction.h5')
-
-#mtcnn = MTCNN(image_size=224, margin=10, keep_all=True, min_face_size=40)
+model_recognition = load_model_recognition()
 
 
 def image_proc(input):
@@ -45,6 +48,7 @@ def image_proc(input):
     'Angry', 'Happy', 'Sad', 'Neutral'
     ]
     text = 'Neutral'
+    text_recognition = 'Unknown'
 
     open_cv_image = pil_image_to_array(input)
     open_cv_image = open_cv_image[:, :, ::-1].copy()
@@ -56,27 +60,27 @@ def image_proc(input):
 
     faces, boxes, probs = fast_mtcnn([img])
 
-    if faces is not None:
+    if faces is not None and type(faces) is not type(None):
+
         #boxes, _ = mtcnn.detect(base64_to_pil_image(input))
         for i, prob in enumerate(probs[0]):  #enumerate(prob_list):
-
-            if prob is not None and prob > 0.60:
+            if prob is not None and prob > 0.60 and type(
+                    faces[i]) is not type(None):
                 #fc = faces[i].permute(1, 2, 0).numpy()
+
 
                 fc = faces[i]
                 fc = fc[:, :, ::-1].copy()
 
-                # fc_gray = cv2.cvtColor(fc, cv2.COLOR_BGR2GRAY)
-
-                # roi = cv2.resize(fc_gray, (48, 48))
                 roi_face = cv2.resize(fc, (96, 96))
-
                 roi_gender = cv2.resize(cv2.cvtColor(fc, cv2.COLOR_BGR2GRAY),
                                         (48, 48))
 
-
                 roi_age_temp = cv2.resize(fc, (224, 224))
                 roi_age = preprocess_input(roi_age_temp)
+
+                roi_recognition = cv2.resize(fc, (160, 160))
+                roi_recognition_new = preprocess_input(roi_recognition[np.newaxis, :, :])
 
 
                 pred = loaded_model.predict(roi_face[np.newaxis, :, :])
@@ -96,23 +100,18 @@ def image_proc(input):
                     pred_mean[6:7].max()
                 ])
 
-                print(pred_resume)
+                # print(pred_resume)
 
-
-
-                # pred_gender = loaded_model_gender.predict(roi[np.newaxis, :, :,
-                #                                               np.newaxis])
                 pred_gender = loaded_model_gender.predict(roi_gender[np.newaxis, :, :])
-                # pred_ethiny = loaded_model_ethiny.predict(roi[np.newaxis, :, :,
-                #                                              np.newaxis])
-                # pred_age = loaded_model_age.predict(roi[np.newaxis, :, :,
-                #                                         np.newaxis])
                 pred_age = loaded_model_age.predict(roi_age[np.newaxis, :, :])
+                pred_recognition = model_recognition.predict(roi_recognition_new)
 
 
                 text = get_emotion(np.argmax(pred_resume))
                 text_gender = get_gender(pred_gender[0][0])
                 text_age = get_age(pred_age[0])
+                text_recognition = recognition(pred_recognition[0], marcos, adriel, vitor)
+
 
                 box = boxes[0][i]
                 box = box.astype(int)
@@ -121,9 +120,10 @@ def image_proc(input):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
                 cv2.putText(img, text_age, (box[0] + 70, box[1] + 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
-                # cv2.putText(img, text_ethiny, (box[2] - 100, box[3]),
-                #             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
-                cv2.putText(img, text, (box[2] - 50, box[3] + 15),
+                cv2.putText(img, text_recognition, (box[2] - 100, box[3] + 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
+                cv2.putText(img, text, (box[2] + 20, box[3] + 10),
+
                             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 255), 2)
 
                 img = cv2.rectangle(img, (box[0], box[1]), (box[2], box[3]),
@@ -131,4 +131,4 @@ def image_proc(input):
 
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     image_data = array_to_base64(img)
-    return image_data, pred_resume, text_list, text
+    return image_data, pred_resume, text_list, text, text_recognition

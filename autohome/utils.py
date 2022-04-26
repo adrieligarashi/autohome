@@ -2,6 +2,8 @@ from PIL import Image
 from io import BytesIO
 import base64
 import numpy as np
+from deepface.basemodels import Facenet
+from scipy.spatial.distance import cosine
 
 
 def pil_image_to_base64(pil_image):
@@ -44,3 +46,26 @@ def get_emotion(emotion):
     if emotion == 1: return "Happy"
     if emotion == 2: return "Sad"
     if emotion == 3: return "Neutral"
+
+def load_model_recognition():
+    model = Facenet.InceptionResNetV2(dimension = 512)
+    model.load_weights('./autohome/models/facenet512_weights.h5')
+
+    return model
+
+def load_saves():
+    marcos = np.load(r'autohome/models/marcos.npy')
+    adriel = np.load(r'autohome/models/adriel.npy')
+    vitor = np.load(r'autohome/models/vitor.npy')
+    return marcos, adriel, vitor
+
+def recognition(pred_recognition, marcos, adriel, vitor):
+    if cosine(pred_recognition, marcos) < 0.4:
+        text = 'Marcos'
+    elif cosine(pred_recognition, adriel) < 0.4:
+        text = 'Adriel'
+    elif cosine(pred_recognition, vitor) < 0.4:
+        text = 'Vitor'
+    else:
+        text = 'Unknown'
+    return text
