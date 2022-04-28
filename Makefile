@@ -55,4 +55,4 @@ pypi:
 	@twine upload dist/* -u $(PYPI_USERNAME)
 
 run:
-	@gunicorn -k eventlet -w 1 autohome.app:app --log-file=-
+	@gunicorn -k eventlet -w 1 autohome.app:app --log-file=- --timeout 600
