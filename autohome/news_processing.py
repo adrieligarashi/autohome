@@ -1,8 +1,9 @@
 from newspaper import Article
 from pygooglenews import GoogleNews
+from googletrans import Translator
 
 
-def get_news_text_from_google_feed(n=5):
+def get_news_from_google_feed(n=5):
     # Pega a url das n principais noticias do RSS do Google News
     gn = GoogleNews(country='BR', lang='pt')
 
@@ -11,25 +12,34 @@ def get_news_text_from_google_feed(n=5):
     links = [top_news[i]['link'] for i in range(n)]
 
     # Pega o conteudo das noticias
-    textos = []
-    keywords = []
-    for url in links:
-        article = Article(url, language='pt')
+    noticias = {}
+    for i, url in enumerate(links):
+        article = Article(url, language='pt', fetch_images=False)
         article.download()
         article.parse()
-        article.nlp()
 
-        texto = article.text
-        texto = texto.replace('\n', ' ')
-        texto = texto.strip()
+        text = article.text
+        text = text.replace('\n', ' ')
+        text = text.strip()
 
-        textos.append(texto)
-        keywords.append(article.keywords)
+        noticias[i] = {'title': article.title,
+                       'text': text}
 
-    return textos, keywords
+    return noticias
+
+
+def translate_title(noticias: dict):
+    translator = Translator()
+
+    for content in noticias.values():
+        trans = translator.translate(content['title'], src='pt', dest='en')
+        content['translation'] = trans.text
+
+    return noticias
 
 if __name__ == '__main__':
 
-    textos, kws = get_news_text_from_google_feed()
-    print(repr(textos[0]))
-    print(kws[0])
+    noticias = get_news_from_google_feed()
+    noticias = translate_title(noticias)
+
+    print(noticias[0])

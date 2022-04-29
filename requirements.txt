@@ -79,3 +79,4 @@ python-dotenv
 deepface==0.0.74
 newspaper3k
 pygooglenews
+googletrans
