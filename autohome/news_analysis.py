@@ -95,7 +95,7 @@ class News():
         Receives:
             - n: The number of news to analyze
         ---------
-        Returns:
+        Returns: dictionary
             - self.news: {- n: {
                 title: The original title of the article
                 text: The original text of the article
@@ -110,8 +110,31 @@ class News():
 
         return self.news
 
+    def get_news_by_sentiment(self):
+        '''
+        Gets the dictionary with the news already analyzes and separates them
+        into 3 lists, one for each possible sentiment.
+        ----------
+        Returns: tuple
+            - positive_news: A list with the positive news.
+            - neutral_news: A list with the neutral news.
+            - negative_news: A list with the negative news.
+        '''
+        positive_news = [self.news[i] for i, article in self.news.items() \
+                         if article['sentiment'].lower() == 'positive'.lower()]
+
+        neutral_news = [self.news[i] for i, article in self.news.items() \
+                    if article['sentiment'].lower() == 'neutral'.lower()]
+
+        negative_news = [self.news[i] for i, article in self.news.items() \
+            if article['sentiment'].lower() == 'negative'.lower()]
+
+        return positive_news, neutral_news, negative_news
+
 
 if __name__ == '__main__':
     news = News()
     news.get_news()
-    print(news.news[0])
+    positive, neutral, negative = news.get_news_by_sentiment()
+
+    print(len(positive), len(neutral), len(negative))
