@@ -63,7 +63,7 @@ class MusicPlayer(spotipy.Spotify):
         correspondent to the predicted mood, returns its URI and URL.
         -----------
         Returns:
-            - (playlist_uri: str,.playlist_id: str)
+            - (playlist_uri: str, playlist_id: str)
 
         """
         playlists = self.current_user_playlists()["items"]
@@ -107,7 +107,7 @@ class MusicPlayer(spotipy.Spotify):
         return self.recommendations_uri
 
 
-    def create_custom_playlist(self, mood, new_playlist=False) -> str:
+    def create_custom_playlist(self, mood) -> str:
         """
         This method takes the recommendated tracks and add to the current mood's
         playlist, by default, and returns the playlist's URI and URL.
@@ -126,19 +126,14 @@ class MusicPlayer(spotipy.Spotify):
         if not self.recommendations_uri:
             self.recommendations_uri = self.get_recomendations_uri()
 
-        if not new_playlist:
-            self.playlist_add_items(self.playlist_uri, self.recommendations_uri)
-        else:
-            self.user_playlist_create(self.user_id, f"{self.mood}_new".capitalize())
+        self.user_playlist_remove_all_occurrences_of_tracks(
+            self.user_id,
+            self.playlist_id,
+            self.tracks_uri
+        )
 
-            playlists = self.current_user_playlists()["items"]
-
-            for n in range(len(playlists)):
-                if playlists[n]["name"].upper() == f"{self.mood}_new".upper():
-                    self.playlist_uri = playlists[n]["uri"]
-                    self.playlist_id = playlists[n]["id"]
-
-            self.playlist_add_items(self.playlist_uri, self.recommendations_uri)
+        self.playlist_add_items(self.playlist_uri, self.tracks_uri[:5])
+        self.playlist_add_items(self.playlist_uri, self.recommendations_uri)
 
         return self.playlist_uri, self.playlist_id
 
@@ -174,6 +169,6 @@ class MusicPlayer(spotipy.Spotify):
 
 if __name__ == "__main__":
     sp = MusicPlayer()
-    sp.create_custom_playlist('happy')
+    sp.create_custom_playlist('angry')
     id = sp.devices()
     print(id)
