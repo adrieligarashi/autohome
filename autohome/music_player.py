@@ -1,7 +1,8 @@
 import spotipy
+import os
 
 from random import sample
-from spotipy.oauth2 import SpotifyOAuth
+from spotipy.oauth2 import SpotifyPKCE
 from dotenv import find_dotenv, load_dotenv
 
 
@@ -30,6 +31,12 @@ class MusicPlayer(spotipy.Spotify):
         env_path = find_dotenv()
         load_dotenv(env_path)
 
+        cwd = os.getcwd()
+        cache_path = cwd + '/autohome/caches/cache'
+
+        if os.path.exists(cache_path):
+            os.remove(cache_path)
+
         scope = [
             "playlist-read-private",
             "user-modify-playback-state",
@@ -41,7 +48,7 @@ class MusicPlayer(spotipy.Spotify):
             "playlist-modify-private"
         ]
 
-        self.auth = SpotifyOAuth(scope=scope)
+        self.auth = SpotifyPKCE(scope=scope, cache_path=cache_path)
         super().__init__(auth_manager=self.auth)
         self.user_id = self.current_user()["id"]
         self.playlist_uri = None
@@ -49,6 +56,7 @@ class MusicPlayer(spotipy.Spotify):
         self.recommendations_uri = None
         self.device = None
         self.mood = mood
+
 
     def get_playlist_uri(self) -> tuple:
         """
@@ -67,6 +75,7 @@ class MusicPlayer(spotipy.Spotify):
                 self.playlist_id = playlists[n]["id"]
 
         return self.playlist_uri, self.playlist_id
+
 
     def get_recomendations_uri(self, n_recoms=50) -> list:
         """
@@ -97,6 +106,7 @@ class MusicPlayer(spotipy.Spotify):
         ]
 
         return self.recommendations_uri
+
 
     def create_custom_playlist(self, new_playlist=False) -> str:
         """
@@ -131,6 +141,7 @@ class MusicPlayer(spotipy.Spotify):
 
         return self.playlist_uri, self.playlist_id
 
+
     def get_device_id(self) -> str:
         '''
         This method returns the current device's ID
@@ -142,6 +153,7 @@ class MusicPlayer(spotipy.Spotify):
                 return None
 
         return self.device
+
 
     def play_new_playlist(self) -> None:
         """
@@ -161,5 +173,6 @@ class MusicPlayer(spotipy.Spotify):
 
 if __name__ == "__main__":
     sp = MusicPlayer("Sad")
+    sp.create_custom_playlist()
     id = sp.devices()
     print(id)
