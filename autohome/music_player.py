@@ -26,7 +26,7 @@ class MusicPlayer(spotipy.Spotify):
         - SPOTIPY_REDIRECT_URI
     """
 
-    def __init__(self, mood) -> None:
+    def __init__(self) -> None:
 
         env_path = find_dotenv()
         load_dotenv(env_path)
@@ -55,8 +55,7 @@ class MusicPlayer(spotipy.Spotify):
         self.playlist_id = None
         self.recommendations_uri = None
         self.device = None
-        self.mood = mood
-
+        self.mood = None
 
     def get_playlist_uri(self) -> tuple:
         """
@@ -108,7 +107,7 @@ class MusicPlayer(spotipy.Spotify):
         return self.recommendations_uri
 
 
-    def create_custom_playlist(self, new_playlist=False) -> str:
+    def create_custom_playlist(self, mood, new_playlist=False) -> str:
         """
         This method takes the recommendated tracks and add to the current mood's
         playlist, by default, and returns the playlist's URI and URL.
@@ -122,6 +121,8 @@ class MusicPlayer(spotipy.Spotify):
         Returns:
             - (playlist_uri: str,.playlist_id: str)
         """
+        self.mood = mood
+
         if not self.recommendations_uri:
             self.recommendations_uri = self.get_recomendations_uri()
 
@@ -172,7 +173,7 @@ class MusicPlayer(spotipy.Spotify):
 
 
 if __name__ == "__main__":
-    sp = MusicPlayer("Sad")
-    sp.create_custom_playlist()
+    sp = MusicPlayer()
+    sp.create_custom_playlist('happy')
     id = sp.devices()
     print(id)
