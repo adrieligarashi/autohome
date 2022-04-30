@@ -137,4 +137,5 @@ if __name__ == '__main__':
     news.get_news()
     positive, neutral, negative = news.get_news_by_sentiment()
 
-    print(len(positive), len(neutral), len(negative))
+    for new in positive:
+        print(new['sentiment'])
