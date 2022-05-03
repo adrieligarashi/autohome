@@ -115,7 +115,7 @@ class News():
 
         return self.news
 
-    def get_news_by_sentiment(self):
+    def get_news_by_sentiment(self, n=5):
         '''
         Gets the dictionary with the news already analyzes and separates them
         into 3 lists, one for each possible sentiment.
@@ -126,7 +126,7 @@ class News():
             - negative_news: A list with the negative news.
         '''
         if not self.news:
-            self.get_news()
+            self.get_news(n)
 
         positive_news = [self.news[i] for i, article in self.news.items() \
                          if article['sentiment'].lower() == 'positive'.lower()]

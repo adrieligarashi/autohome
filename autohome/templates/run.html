@@ -148,7 +148,7 @@
         <script>
           document.getElementById("result").innerHTML;
         </script>
-
+        <button id="togglePlay">{{ title }}</button>
         <script src="https://sdk.scdn.co/spotify-player.js" async></script>
         <script>
           window.onSpotifyWebPlaybackSDKReady = () => {
@@ -213,9 +213,21 @@
               })
             }, 1800)
 
-            // document.getElementById('togglePlay').onclick = function () {
-            //   player.togglePlay();
-            // }
+            document.getElementById('togglePlay').onclick = function () {
+                player.togglePlay()
+                console.log('Cliquei')
+
+                const getData = fetch('/', {
+                  method: "POST",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    clicked: "1"
+                  })
+                })
+                console.log('depois do get data')
+              }
           }
         </script>
 

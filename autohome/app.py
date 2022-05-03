@@ -1,4 +1,5 @@
 from sys import stdout
+from turtle import title
 from autohome.process import webopencv
 import logging
 from flask import Flask, render_template, Response, request, jsonify
@@ -8,6 +9,7 @@ from autohome.image_processing import image_proc
 import numpy as np
 from autohome.music_player import MusicPlayer
 from autohome.mqtt import mqtt_publish
+from autohome.news_analysis import News
 
 
 pred_resume = np.array([0, 0, 0, 0.1])
@@ -21,6 +23,7 @@ na_casa = 0
 sp = ''
 uri = ''
 token = ''
+news_title = 'Waiting for you to get home'
 
 
 app = Flask(__name__)
@@ -33,6 +36,17 @@ camera = Camera(webopencv())
 client = mqtt_publish.connect_mqtt()
 client.loop_start()
 
+news = News()
+n_news = 10
+
+positive_news, neutral_news, negative_news = news.get_news_by_sentiment(n=n_news)
+print(len(positive_news), len(neutral_news), len(negative_news))
+
+# while len(positive_news) < 3:
+
+#     positive_news, neutral_news, negative_news = news.get_news_by_sentiment(n=n_news)
+
+#     n_news += 1
 
 @socketio.on('input image', namespace='/test')
 def test_message(input):
@@ -81,7 +95,24 @@ def run():
             mqtt_publish.publish(client,
                                  topic='le_wagon_769',
                                  msg=f"{felling_spotify}, {text_recognition}")
-            na_casa = 0
+
+        front_news = []
+        if felling_spotify.lower() == 'happy':
+            front_news.append(positive_news[0])
+            front_news.append(neutral_news[0])
+            front_news.append(negative_news[0])
+
+        if felling_spotify.lower() == 'neutral':
+            front_news.append(positive_news[:2])
+            front_news.append(neutral_news[0])
+
+        if felling_spotify.lower() == 'sad' or felling_spotify.lower() == 'angry':
+            front_news.append(positive_news[:3])
+
+        titles = [article['title'] for article in front_news]
+        texts = [article['text'] for article in front_news]
+
+
 
     return render_template('run.html',
                         values=pred_resume.tolist(),
@@ -89,7 +120,8 @@ def run():
                         felling_spotify = felling_spotify,
                         playlist=uri,
                         token=token,
-                        text_recognition=text_recognition)
+                        text_recognition=text_recognition,
+                        title=titles[0])
 
 
 @app.route('/data', methods=['GET'])
