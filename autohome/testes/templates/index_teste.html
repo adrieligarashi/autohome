@@ -75,7 +75,19 @@
 
           document.getElementById('togglePlay').onclick = function () {
             player.togglePlay()
-            window.location.href='{{ site }}'
+            // window.location.href='{{ site }}'
+            console.log('Cliquei')
+
+            const getData = fetch('/', {
+              method: "POST",
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                clicked: "1"
+              })
+            })
+            console.log('depois do get data')
           }
         }
       </script>
