@@ -56,6 +56,10 @@ def test_connect():
 
 @app.route('/')
 def index():
+    global sp
+
+    sp = MusicPlayer()
+
     return render_template('index.html')
 
 
@@ -72,8 +76,7 @@ def run():
 
         if na_casa == '1':
             felling_spotify = text
-            sp = MusicPlayer(mood=felling_spotify)
-            uri, _ = sp.create_custom_playlist()
+            uri, _ = sp.create_custom_playlist(mood=felling_spotify)
             token = sp.auth.get_cached_token()['access_token']
             mqtt_publish.publish(client,
                                  topic='le_wagon_769',
