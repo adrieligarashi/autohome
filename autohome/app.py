@@ -24,6 +24,7 @@ uri = ''
 token = ''
 titles = ['Waiting for you to get home', 'Waiting for you to get home',
             'Waiting for you to get home']
+texts = []
 
 app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler(stdout))
@@ -39,7 +40,8 @@ news = News()
 n_news = 7
 
 positive_news, neutral_news, negative_news = news.get_news_by_sentiment(n=n_news)
-print(len(positive_news), len(neutral_news), len(negative_news))
+len_pos, len_neut, len_neg = len(positive_news), len(neutral_news), len(negative_news)
+print(len_pos, len_neut, len_neg)
 
 
 @socketio.on('input image', namespace='/test')
@@ -78,9 +80,10 @@ def run():
     global uri
     global token, text, sp, text_recognition
     global titles
+    global texts
 
     clicks = {}
-    front_news = [0, 1, 2]
+    front_news = []
 
     if request.method == 'POST':
         na_casa = request.form.get('botaocasa')
@@ -95,68 +98,76 @@ def run():
                                  msg=f"{felling_spotify}, {text_recognition}")
 
 
-            if felling_spotify.lower() == 'happy':
-                try:
-                    front_news[0] = positive_news[0]
-                    front_news[1] = neutral_news[0]
-                    front_news[2] = negative_news[0]
-                except:
-                    for i, article in enumerate(front_news):
-                        if article is int:
-                            front_news[i] = None
+            if felling_spotify.lower() == 'happy' or felling_spotify.lower() == 'neutral':
+                for article in positive_news:
+                    try:
+                        front_news.append(article)
+                    except:
+                        continue
+                    if len(front_news) >= 3:
+                        break
 
-            if felling_spotify.lower() == 'neutral':
-                try:
-                    if len(positive_news) >= 2:
-                        front_news[0] = positive_news[0]
-                        front_news[1] = positive_news[1]
-                    else:
-                        front_news[0] = positive_news[0]
+                for article in neutral_news:
+                    try:
+                        front_news.append(article)
+                    except:
+                        continue
+                    if len(front_news) >= 3:
+                        break
 
-                    if front_news[1] is int:
-                        front_news[1] = neutral_news[0]
+                for article in negative_news:
+                    try:
+                        front_news.append(article)
+                    except:
+                        continue
+                    if len(front_news) >= 3:
+                        break
 
-                    front_news[2] = neutral_news[1]
-                except:
-                    for i, article in enumerate(front_news):
-                        if article is int:
-                            front_news[i] = None
 
             if felling_spotify.lower() == 'sad' or felling_spotify.lower() == 'angry':
-                try:
-                    front_news[0] = positive_news[0]
-                    front_news[1] = positive_news[1]
-                    front_news[2] = positive_news[2]
-                except:
-                    for i, article in enumerate(front_news):
-                        if article is int:
-                            front_news[i] = None
+                for article in positive_news:
+                    try:
+                        front_news.append(article)
+                    except:
+                        continue
+                    if len(front_news) >= 3:
+                        break
+
+                for article in neutral_news:
+                    try:
+                        front_news.append(article)
+                    except:
+                        continue
+                    if len(front_news) >= 3:
+                        break
+
+            if len(front_news) < 3:
+                place_holder = {'title': 'Não tem notícia pra você hoje.',
+                                'text': 'Desculpe, mas não tenho uma notícia apropriada para você hoje.'}
+                front_news.append(place_holder)
+
 
             try:
                 titles = [article['title'] for article in front_news]
+                texts = [article['text'] for article in front_news]
             except:
                 print('titulos quebrados')
+                print(front_news)
+                print(titles)
 
-
-        if na_casa is None:
-            try:
-                clicks['clicked'] = request.json('clicked')
-                clicks = jsonify(clicks)
-                clicks['clicked'] = request.form.get('botao1')
-                print('deu none')
-            except:
-                print('nao deu ainda none')
 
         try:
-            clicks['clicked'] = request.json('clicked')
-            clicks = jsonify(clicks)
-            clicks['clicked'] = request.form.get('togglePlay1')
-            print('deu fora do none')
+            clicks = request.get_json()
         except:
-            print('nao deu ainda fora do none')
+            print('nao deu ainda clicked getjson')
 
-        print(clicks)
-
+        if clicks is not None:
+            if clicks['clicked'] == '1':
+                print(texts[0])
+            elif clicks['clicked'] == '2':
+                print(texts[1])
+            elif clicks['clicked'] == '3':
+                print(texts[2])
 
 
     return render_template('run.html',

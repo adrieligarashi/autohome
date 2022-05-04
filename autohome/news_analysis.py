@@ -41,7 +41,7 @@ class News():
             self.news[i] = {'url': article.url,
                             'title': article.title,
                             'text': text
-                           }
+                            }
 
 
     def translate_titles(self):
@@ -112,6 +112,10 @@ class News():
         self.get_top_news(n)
         self.translate_titles()
         self.get_sentiment_of_news()
+
+        for i, article in self.news.copy().items():
+            if 'ao vivo' in article['title'].lower():
+                _ = self.news.pop(i, None)
 
         return self.news
 

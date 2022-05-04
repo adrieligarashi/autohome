@@ -148,12 +148,9 @@
         <script>
           document.getElementById("result").innerHTML;
         </script>
-        <!-- <button id="togglePlay1">{{ titles[0] }}</button>
+        <button id="togglePlay1">{{ titles[0] }}</button>
         <button id="togglePlay2">{{ titles[1] }}</button>
-        <button id="togglePlay3">{{ titles[2] }}</button> -->
-        <form method="post">
-          <input type="button" value="{{ titles[0] }}" name="botao1">
-        </form>
+        <button id="togglePlay3">{{ titles[2] }}</button>
         <script src="https://sdk.scdn.co/spotify-player.js" async></script>
         <script>
           window.onSpotifyWebPlaybackSDKReady = () => {
@@ -218,7 +215,7 @@
               })
             }, 1800)
 
-            document.getElementsByName('botao1').onclick = function () {
+            document.getElementById('togglePlay1').onclick = function () {
                 player.togglePlay()
                 console.log('Cliquei1')
 
