@@ -30,6 +30,7 @@ app.config['DEBUG'] = True
 socketio = SocketIO(app)
 camera = Camera(webopencv())
 
+
 client = mqtt_publish.connect_mqtt()
 client.loop_start()
 
