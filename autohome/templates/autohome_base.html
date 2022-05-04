@@ -63,79 +63,63 @@
           <li class="nav-item dropdown dropdown-hover mx-2 ms-lg-6">
             <a class="nav-link ps-2 d-flex cursor-pointer align-items-center" id="dropdownMenuPages2" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="material-icons opacity-6 me-2 text-md">dashboard</i>
-              O Projeto
+              The Project
               <img src="../static/assets/img/down-arrow-white.svg" alt="down-arrow" class="arrow ms-auto ms-md-2 d-lg-block d-none">
               <img src="../static/assets/img/down-arrow-dark.svg" alt="down-arrow" class="arrow ms-auto ms-md-2 d-lg-none d-block">
             </a>
+            <div class="dropdown-menu dropdown-menu-animation ms-n3 dropdown-md p-3 border-radius-xl mt-0 mt-lg-3"
+              aria-labelledby="dropdownMenuPages">
+              <div class="d-none d-lg-block">
+                <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center px-1">
+                  What is this ?
+                </h6>
+                <a href="../whatisthis" class="dropdown-item border-radius-md">
+                  <span>Scope</span>
+                </a>
+                <a href="../scope" class="dropdown-item border-radius-md">
+                  <span>Solutions</span>
+                </a>
+                <a href="../flowchart" class="dropdown-item border-radius-md">
+                  <span>Flow Chart</span>
+                </a>
+                <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center px-1 mt-3">
+                  Tools
+                </h6>
+                <a href="../technologies" class="dropdown-item border-radius-md">
+                  <span>Technologies</span>
+                </a>
+                <a href="../dataengineering" class="dropdown-item border-radius-md">
+                  <span>Data Engineering</span>
+                </a>
+              </div>
+            </div>
           </li>
 
           <li class="nav-item dropdown dropdown-hover mx-2">
             <a href="../run" class="nav-link ps-2 d-flex cursor-pointer align-items-center" id="dropdownMenuBlocks" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="material-icons opacity-6 me-2 text-md">view_day</i>
               Run it !
-              <!-- <img src="../static/assets/img/down-arrow-white.svg" alt="down-arrow" class="arrow ms-auto ms-md-2 d-lg-block d-none">
-              <img src="../static/assets/img/down-arrow-dark.svg" alt="down-arrow" class="arrow ms-auto ms-md-2 d-lg-none d-block"> -->
             </a>
-
-            <!-- <div class="dropdown-menu dropdown-menu-animation ms-n3 dropdown-md p-3 border-radius-xl mt-0 mt-lg-3"
-              aria-labelledby="dropdownMenuPages">
-              <div class="d-none d-lg-block">
-                <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center px-1">
-                  Landing Pages
-                </h6>
-                <a href="../static/pages/about-us.html" class="dropdown-item border-radius-md">
-                  <span>About Us</span>
-                </a>
-                <a href="../static/pages/contact-us.html" class="dropdown-item border-radius-md">
-                  <span>Contact Us</span>
-                </a>
-                <a href="../static/pages/author.html" class="dropdown-item border-radius-md">
-                  <span>Author</span>
-                </a>
-                <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center px-1 mt-3">
-                  Account
-                </h6>
-                <a href="../static/pages/sign-in.html" class="dropdown-item border-radius-md">
-                  <span>Sign In</span>
-                </a>
-              </div>
-
-              <div class="d-lg-none">
-                <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center px-1">
-                  Landing Pages
-                </h6>
-
-                <a href="../static/pages/about-us.html" class="dropdown-item border-radius-md">
-                  <span>About Us</span>
-                </a>
-                <a href="../static/pages/contact-us.html" class="dropdown-item border-radius-md">
-                  <span>Contact Us</span>
-                </a>
-                <a href="../static/pages/author.html" class="dropdown-item border-radius-md">
-                  <span>Author</span>
-                </a>
-
-                <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center px-1 mt-3">
-                  Account
-                </h6>
-                <a href="../static/pages/sign-in.html" class="dropdown-item border-radius-md">
-                  <span>Sign In</span>
-                </a>
-
-              </div>
-
-            </div> -->
-
-
           </li>
 
           <li class="nav-item dropdown dropdown-hover mx-2">
             <a class="nav-link ps-2 d-flex cursor-pointer align-items-center" id="dropdownMenuDocs" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="material-icons opacity-6 me-2 text-md">article</i>
-              Sobre Nós
-              <img src="../static/assets/img/down-arrow-white.svg" alt="down-arrow" class="arrow ms-auto ms-md-2 d-lg-block d-none">
+              About Us<img src="../static/assets/img/down-arrow-white.svg" alt="down-arrow" class="arrow ms-auto ms-md-2 d-lg-block d-none">
               <img src="../static/assets/img/down-arrow-dark.svg" alt="down-arrow" class="arrow ms-auto ms-md-2 d-lg-none d-block">
             </a>
+
+            <div class="dropdown-menu dropdown-menu-animation ms-n3 dropdown-md p-3 border-radius-xl mt-0 mt-lg-3"
+              aria-labelledby="dropdownMenuPages">
+              <div class="d-none d-lg-block">
+                <a href="../theteam" class="dropdown-item border-radius-md">
+                  <span>Meet The Team</span>
+                </a>
+                <a href="../linkedin" class="dropdown-item border-radius-md">
+                  <span>LinkedIn</span>
+                </a>
+              </div>
+            </div>
           </li>
           <!-- <li class="nav-item ms-lg-auto my-auto ms-3 ms-lg-0 mt-2 mt-lg-0">
             <a href="https://www.creative-tim.com/product/material-kit" class="btn btn-sm  bg-gradient-primary mb-0 me-1 mt-2 mt-md-0">Free Download</a></li> -->
@@ -162,6 +146,14 @@
 
   {% block bodyrun %}{% endblock %}
   {% block body_index %}{% endblock %}
+  {% block body_dataengineering %}{% endblock %}
+  {% block body_flowchart %}{% endblock %}
+  {% block body_linkedin %}{% endblock %}
+  {% block body_scope %}{% endblock %}
+  {% block body_solutions %}{% endblock %}
+  {% block body_technologies %}{% endblock %}
+  {% block body_theteam %}{% endblock %}
+
   <!-- <div class="card card-body shadow-xl mx-3 mx-md-4 mt-n6">
     <div class="container">
       <div class="section text-center">
@@ -179,21 +171,21 @@
 
         <div class="col-md-2 col-sm-6 col-6 mb-4">
           <div>
-            <h6 class="text-sm">O Projeto</h6>
+            <h6 class="text-sm">The project</h6>
             <ul class="flex-column ms-n3 nav">
               <li class="nav-item">
-                <a class="nav-link" href="https://iradesign.io/" target="_blank">
-                  Illustrations
+                <a class="nav-link" href="../scope">
+                  Scope
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="https://www.creative-tim.com/bits" target="_blank">
-                  Bits & Snippets
+                <a class="nav-link" href="../solutions">
+                  Solutions
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="https://www.creative-tim.com/affiliates/new" target="_blank">
-                  Affiliate Program
+                <a class="nav-link" href="../flowchart">
+                  Flow Chart
                 </a>
               </li>
             </ul>
@@ -201,26 +193,16 @@
         </div>
         <div class="col-md-2 col-sm-6 col-6 mb-4">
           <div>
-            <h6 class="text-sm">Sobre Nós</h6>
+            <h6 class="text-sm">About Us</h6>
             <ul class="flex-column ms-n3 nav">
               <li class="nav-item">
-                <a class="nav-link" href="https://www.creative-tim.com/contact-us" target="_blank">
-                  Contact Us
+                <a class="nav-link" href="../theteam">
+                  Meet The Team!
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="https://www.creative-tim.com/knowledge-center" target="_blank">
-                  Knowledge Center
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="https://services.creative-tim.com/?ref=ct-mk2-footer" target="_blank">
-                  Custom Development
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="https://www.creative-tim.com/sponsorships" target="_blank">
-                  Sponsorships
+                <a class="nav-link" href="../linkedin">
+                  LinkedIn
                 </a>
               </li>
             </ul>
