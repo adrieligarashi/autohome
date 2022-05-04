@@ -11,6 +11,7 @@ RUN pip install -r ./requirements.txt
 
 
 EXPOSE 8000
+EXPOSE 8080
 
 #ENTRYPOINT ["streamlit", "run", "autohome/main_site.py", "--server.port=8501", "--server.address=0.0.0.0"]
 

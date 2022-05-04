@@ -43,7 +43,6 @@ class News():
                             'text': text
                             }
 
-
     def translate_titles(self):
         '''
         Receives the dict from get_news_from_google_feed, translates the title to
