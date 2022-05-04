@@ -77,6 +77,9 @@ zope.event==4.5.0
 zope.interface==5.4.0
 python-dotenv
 deepface==0.0.74
+scipy
+matplotlib
+pandas
 newspaper3k
 pygooglenews
 googletrans==4.0.0rc1
