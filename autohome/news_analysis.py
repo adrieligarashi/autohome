@@ -114,7 +114,7 @@ class News():
         self.get_sentiment_of_news()
 
         for i, article in self.news.copy().items():
-            if 'ao vivo' in article['title'].lower():
+            if 'cnn' in article['title'].lower():
                 _ = self.news.pop(i, None)
 
         return self.news

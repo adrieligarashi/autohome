@@ -24,7 +24,9 @@ uri = ''
 token = ''
 titles = ['Waiting for you to get home', 'Waiting for you to get home',
             'Waiting for you to get home']
-texts = []
+texts = ['Waiting for you to get home', 'Waiting for you to get home',
+            'Waiting for you to get home']
+urls = ['/run', '/run', '/run']
 
 app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler(stdout))
@@ -81,6 +83,7 @@ def run():
     global token, text, sp, text_recognition
     global titles
     global texts
+    global urls
 
     clicks = {}
     front_news = []
@@ -143,13 +146,15 @@ def run():
 
             if len(front_news) < 3:
                 place_holder = {'title': 'Não tem notícia pra você hoje.',
-                                'text': 'Desculpe, mas não tenho uma notícia apropriada para você hoje.'}
+                                'text': 'Desculpe, mas não tenho uma notícia apropriada para você hoje.',
+                                'url': '/'}
                 front_news.append(place_holder)
 
 
             try:
                 titles = [article['title'] for article in front_news]
                 texts = [article['text'] for article in front_news]
+                urls = [article['url'] for article in front_news]
             except:
                 print('titulos quebrados')
                 print(front_news)
@@ -163,11 +168,17 @@ def run():
 
         if clicks is not None:
             if clicks['clicked'] == '1':
-                print(texts[0])
+                mqtt_publish.publish(client,
+                                 topic='le_wagon_769_news',
+                                 msg=f"{texts[0]}")
             elif clicks['clicked'] == '2':
-                print(texts[1])
+                mqtt_publish.publish(client,
+                                 topic='le_wagon_769_news',
+                                 msg=f"{texts[1]}")
             elif clicks['clicked'] == '3':
-                print(texts[2])
+                mqtt_publish.publish(client,
+                                 topic='le_wagon_769_news',
+                                 msg=f"{texts[2]}")
 
 
     return render_template('run.html',
@@ -177,7 +188,8 @@ def run():
                         playlist=uri,
                         token=token,
                         text_recognition=text_recognition,
-                        titles=titles)
+                        titles=titles,
+                        urls=urls)
 
 
 @app.route('/data', methods=['GET'])
