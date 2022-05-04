@@ -8,6 +8,7 @@ from autohome.image_processing import image_proc
 import numpy as np
 from autohome.music_player import MusicPlayer
 from autohome.mqtt import mqtt_publish
+from autohome.news_analysis import News
 
 
 pred_resume = np.array([0, 0, 0, 0.1])
@@ -21,7 +22,11 @@ na_casa = 0
 sp = ''
 uri = ''
 token = ''
-
+titles = ['Waiting for you to get home', 'Waiting for you to get home',
+            'Waiting for you to get home']
+texts = ['Waiting for you to get home', 'Waiting for you to get home',
+            'Waiting for you to get home']
+urls = ['/run', '/run', '/run']
 
 app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler(stdout))
@@ -33,6 +38,13 @@ camera = Camera(webopencv())
 
 client = mqtt_publish.connect_mqtt()
 client.loop_start()
+
+news = News()
+n_news = 7
+
+positive_news, neutral_news, negative_news = news.get_news_by_sentiment(n=n_news)
+len_pos, len_neut, len_neg = len(positive_news), len(neutral_news), len(negative_news)
+print(len_pos, len_neut, len_neg)
 
 
 @socketio.on('input image', namespace='/test')
@@ -70,6 +82,12 @@ def run():
     global felling_spotify
     global uri
     global token, text, sp, text_recognition
+    global titles
+    global texts
+    global urls
+
+    clicks = {}
+    front_news = []
 
     if request.method == 'POST':
         na_casa = request.form.get('botaocasa')
@@ -82,7 +100,87 @@ def run():
             mqtt_publish.publish(client,
                                  topic='le_wagon_769',
                                  msg=f"{felling_spotify}, {text_recognition}")
-            na_casa = 0
+
+
+            if felling_spotify.lower() == 'happy' or felling_spotify.lower() == 'neutral':
+                for article in positive_news:
+                    try:
+                        front_news.append(article)
+                    except:
+                        continue
+                    if len(front_news) >= 3:
+                        break
+
+                for article in neutral_news:
+                    try:
+                        front_news.append(article)
+                    except:
+                        continue
+                    if len(front_news) >= 3:
+                        break
+
+                for article in negative_news:
+                    try:
+                        front_news.append(article)
+                    except:
+                        continue
+                    if len(front_news) >= 3:
+                        break
+
+
+            if felling_spotify.lower() == 'sad' or felling_spotify.lower() == 'angry':
+                for article in positive_news:
+                    try:
+                        front_news.append(article)
+                    except:
+                        continue
+                    if len(front_news) >= 3:
+                        break
+
+                for article in neutral_news:
+                    try:
+                        front_news.append(article)
+                    except:
+                        continue
+                    if len(front_news) >= 3:
+                        break
+
+            if len(front_news) < 3:
+                place_holder = {'title': 'Não tem notícia pra você hoje.',
+                                'text': 'Desculpe, mas não tenho uma notícia apropriada para você hoje.',
+                                'url': '/'}
+                front_news.append(place_holder)
+
+
+            try:
+                titles = [article['title'] for article in front_news]
+                texts = [article['text'] for article in front_news]
+                urls = [article['url'] for article in front_news]
+            except:
+                print('titulos quebrados')
+                print(front_news)
+                print(titles)
+
+
+        try:
+            clicks = request.get_json()
+        except:
+            print('nao deu ainda clicked getjson')
+
+        if clicks is not None:
+            if clicks['clicked'] == '1':
+                mqtt_publish.publish(client,
+                                 topic='le_wagon_769_news',
+                                 msg=f"{texts[0]}")
+            elif clicks['clicked'] == '2':
+                mqtt_publish.publish(client,
+                                 topic='le_wagon_769_news',
+                                 msg=f"{texts[1]}")
+            elif clicks['clicked'] == '3':
+                mqtt_publish.publish(client,
+                                 topic='le_wagon_769_news',
+                                 msg=f"{texts[2]}")
+
 
     return render_template('run.html',
                         values=pred_resume.tolist(),
@@ -90,7 +188,9 @@ def run():
                         felling_spotify = felling_spotify,
                         playlist=uri,
                         token=token,
-                        text_recognition=text_recognition)
+                        text_recognition=text_recognition,
+                        titles=titles,
+                        urls=urls)
 
 
 @app.route('/data', methods=['GET'])
