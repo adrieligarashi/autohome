@@ -19,12 +19,13 @@ class News():
         gn = GoogleNews(country='BR', lang='pt')
         self.top_news = gn.top_news()['entries']
 
-        self.news = {}
+        self.news = None
 
 
     def get_top_news(self, n=5):
         '''
-        Gets the n top news from Google News RSS Brazil, in portuguese.
+        Gets the n top news from Google News RSS Brazil, in portuguese and
+        organizes it in a dictionary.
         '''
         links = [self.top_news[i]['link'] for i in range(n)]
 
@@ -37,8 +38,10 @@ class News():
             text = text.replace('\n', ' ')
             text = text.strip()
 
-            self.news[i] = {'title': article.title,
-                            'text': text}
+            self.news[i] = {'url': article.url,
+                            'title': article.title,
+                            'text': text
+                            }
 
 
     def translate_titles(self):
@@ -95,8 +98,9 @@ class News():
         Receives:
             - n: The number of news to analyze
         ---------
-        Returns:
+        Returns: dictionary
             - self.news: {- n: {
+                url: The article's URL
                 title: The original title of the article
                 text: The original text of the article
                 translation: The translation of the title of the article
@@ -104,14 +108,47 @@ class News():
                            in negative, neutral or positive.
             }}
         '''
+        self.news = {}
         self.get_top_news(n)
         self.translate_titles()
         self.get_sentiment_of_news()
 
+        for i, article in self.news.copy().items():
+            if 'cnn' in article['title'].lower():
+                _ = self.news.pop(i, None)
+
         return self.news
+
+    def get_news_by_sentiment(self, n=5):
+        '''
+        Gets the dictionary with the news already analyzes and separates them
+        into 3 lists, one for each possible sentiment.
+        ----------
+        Returns: tuple
+            - positive_news: A list with the positive news.
+            - neutral_news: A list with the neutral news.
+            - negative_news: A list with the negative news.
+        '''
+        if not self.news:
+            self.get_news(n)
+
+        positive_news = []
+        neutral_news = []
+        negative_news = []
+        for i, article in self.news.items():
+            if article['sentiment'].lower() == 'positive'.lower():
+                positive_news.append(self.news[i])
+            elif article['sentiment'].lower() == 'neutral'.lower():
+                neutral_news.append(self.news[i])
+            else:
+                negative_news.append(self.news[i])
+
+
+        return positive_news, neutral_news, negative_news
 
 
 if __name__ == '__main__':
     news = News()
-    news.get_news()
-    print(news.news[0])
+    positive, neutral, negative = news.get_news_by_sentiment(n=7)
+
+    print(len(positive), len(neutral), len(negative))

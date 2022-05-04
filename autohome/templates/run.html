@@ -149,6 +149,16 @@
           document.getElementById("result").innerHTML;
         </script>
 
+        <button onClick="javascript:window.open ('{{ urls[0] }}') ; return false">{{ titles[0] }}</button>
+        <button onClick="javascript:window.open ('{{ urls[1] }}') ; return false">{{ titles[1] }}</button>
+        <button onClick="javascript:window.open ('{{ urls[2] }}') ; return false">{{ titles[2] }}</button>
+        <br>
+        <button id="togglePlay1">{{ titles[0][:-8] }} -- OUVIR</button>
+        <button id="togglePlay2">{{ titles[1][:-8] }} -- OUVIR</button>
+        <button id="togglePlay3">{{ titles[2][:-8] }} -- OUVIR</button>
+        <br>
+        <button id="togglePlay4">Play/Pause Spotify</button>
+
         <script src="https://sdk.scdn.co/spotify-player.js" async></script>
         <script>
           window.onSpotifyWebPlaybackSDKReady = () => {
@@ -213,9 +223,54 @@
               })
             }, 1800)
 
-            // document.getElementById('togglePlay').onclick = function () {
-            //   player.togglePlay();
-            // }
+            document.getElementById('togglePlay1').onclick = function () {
+                // player.togglePlay()
+                console.log('Cliquei1')
+
+                const getData = fetch('/run', {
+                  method: "POST",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    clicked: "1"
+                  })
+                })
+              }
+
+              document.getElementById('togglePlay2').onclick = function () {
+              // player.togglePlay()
+              console.log('Cliquei2')
+
+              const getData = fetch('/run', {
+                method: "POST",
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  clicked: "2"
+                })
+              })
+            }
+
+            document.getElementById('togglePlay3').onclick = function () {
+              // player.togglePlay()
+              console.log('Cliquei3')
+
+              const getData = fetch('/run', {
+                method: "POST",
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  clicked: "3"
+                })
+              })
+            }
+
+            document.getElementById('togglePlay4').onclick = function () {
+              player.togglePlay()
+            }
           }
         </script>
 
