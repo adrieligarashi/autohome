@@ -34,8 +34,10 @@ class MusicPlayer(spotipy.Spotify):
         cwd = os.getcwd()
         cache_path = cwd + '/autohome/caches/cache'
 
+
         if os.path.exists(cache_path):
             os.remove(cache_path)
+
 
         scope = [
             "playlist-read-private",
