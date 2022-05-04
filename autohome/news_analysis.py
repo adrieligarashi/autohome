@@ -128,25 +128,23 @@ class News():
         if not self.news:
             self.get_news(n)
 
-        positive_news = [self.news[i] for i, article in self.news.items() \
-                         if article['sentiment'].lower() == 'positive'.lower()]
+        positive_news = []
+        neutral_news = []
+        negative_news = []
+        for i, article in self.news.items():
+            if article['sentiment'].lower() == 'positive'.lower():
+                positive_news.append(self.news[i])
+            elif article['sentiment'].lower() == 'neutral'.lower():
+                neutral_news.append(self.news[i])
+            else:
+                negative_news.append(self.news[i])
 
-        neutral_news = [self.news[i] for i, article in self.news.items() \
-                    if article['sentiment'].lower() == 'neutral'.lower()]
-
-        negative_news = [self.news[i] for i, article in self.news.items() \
-            if article['sentiment'].lower() == 'negative'.lower()]
 
         return positive_news, neutral_news, negative_news
 
 
 if __name__ == '__main__':
     news = News()
-    positive, neutral, negative = news.get_news_by_sentiment()
+    positive, neutral, negative = news.get_news_by_sentiment(n=7)
 
-    if len(positive) != 0:
-        print(positive[0])
-    if len(neutral) != 0:
-        print(neutral[0])
-    if len(negative) != 0:
-        print(negative[0])
+    print(len(positive), len(neutral), len(negative))

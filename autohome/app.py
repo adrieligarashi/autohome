@@ -1,5 +1,4 @@
 from sys import stdout
-from turtle import title
 from autohome.process import webopencv
 import logging
 from flask import Flask, render_template, Response, request, jsonify
@@ -23,8 +22,8 @@ na_casa = 0
 sp = ''
 uri = ''
 token = ''
-news_title = 'Waiting for you to get home'
-
+titles = ['Waiting for you to get home', 'Waiting for you to get home',
+            'Waiting for you to get home']
 
 app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler(stdout))
@@ -37,16 +36,11 @@ client = mqtt_publish.connect_mqtt()
 client.loop_start()
 
 news = News()
-n_news = 10
+n_news = 7
 
 positive_news, neutral_news, negative_news = news.get_news_by_sentiment(n=n_news)
 print(len(positive_news), len(neutral_news), len(negative_news))
 
-# while len(positive_news) < 3:
-
-#     positive_news, neutral_news, negative_news = news.get_news_by_sentiment(n=n_news)
-
-#     n_news += 1
 
 @socketio.on('input image', namespace='/test')
 def test_message(input):
@@ -83,6 +77,10 @@ def run():
     global felling_spotify
     global uri
     global token, text, sp, text_recognition
+    global titles
+
+    clicks = {}
+    front_news = [0, 1, 2]
 
     if request.method == 'POST':
         na_casa = request.form.get('botaocasa')
@@ -96,21 +94,68 @@ def run():
                                  topic='le_wagon_769',
                                  msg=f"{felling_spotify}, {text_recognition}")
 
-        front_news = []
-        if felling_spotify.lower() == 'happy':
-            front_news.append(positive_news[0])
-            front_news.append(neutral_news[0])
-            front_news.append(negative_news[0])
 
-        if felling_spotify.lower() == 'neutral':
-            front_news.append(positive_news[:2])
-            front_news.append(neutral_news[0])
+            if felling_spotify.lower() == 'happy':
+                try:
+                    front_news[0] = positive_news[0]
+                    front_news[1] = neutral_news[0]
+                    front_news[2] = negative_news[0]
+                except:
+                    for i, article in enumerate(front_news):
+                        if article is int:
+                            front_news[i] = None
 
-        if felling_spotify.lower() == 'sad' or felling_spotify.lower() == 'angry':
-            front_news.append(positive_news[:3])
+            if felling_spotify.lower() == 'neutral':
+                try:
+                    if len(positive_news) >= 2:
+                        front_news[0] = positive_news[0]
+                        front_news[1] = positive_news[1]
+                    else:
+                        front_news[0] = positive_news[0]
 
-        titles = [article['title'] for article in front_news]
-        texts = [article['text'] for article in front_news]
+                    if front_news[1] is int:
+                        front_news[1] = neutral_news[0]
+
+                    front_news[2] = neutral_news[1]
+                except:
+                    for i, article in enumerate(front_news):
+                        if article is int:
+                            front_news[i] = None
+
+            if felling_spotify.lower() == 'sad' or felling_spotify.lower() == 'angry':
+                try:
+                    front_news[0] = positive_news[0]
+                    front_news[1] = positive_news[1]
+                    front_news[2] = positive_news[2]
+                except:
+                    for i, article in enumerate(front_news):
+                        if article is int:
+                            front_news[i] = None
+
+            try:
+                titles = [article['title'] for article in front_news]
+            except:
+                print('titulos quebrados')
+
+
+        if na_casa is None:
+            try:
+                clicks['clicked'] = request.json('clicked')
+                clicks = jsonify(clicks)
+                clicks['clicked'] = request.form.get('botao1')
+                print('deu none')
+            except:
+                print('nao deu ainda none')
+
+        try:
+            clicks['clicked'] = request.json('clicked')
+            clicks = jsonify(clicks)
+            clicks['clicked'] = request.form.get('togglePlay1')
+            print('deu fora do none')
+        except:
+            print('nao deu ainda fora do none')
+
+        print(clicks)
 
 
 
@@ -121,7 +166,7 @@ def run():
                         playlist=uri,
                         token=token,
                         text_recognition=text_recognition,
-                        title=titles[0])
+                        titles=titles)
 
 
 @app.route('/data', methods=['GET'])

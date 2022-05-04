@@ -148,7 +148,12 @@
         <script>
           document.getElementById("result").innerHTML;
         </script>
-        <button id="togglePlay">{{ title }}</button>
+        <!-- <button id="togglePlay1">{{ titles[0] }}</button>
+        <button id="togglePlay2">{{ titles[1] }}</button>
+        <button id="togglePlay3">{{ titles[2] }}</button> -->
+        <form method="post">
+          <input type="button" value="{{ titles[0] }}" name="botao1">
+        </form>
         <script src="https://sdk.scdn.co/spotify-player.js" async></script>
         <script>
           window.onSpotifyWebPlaybackSDKReady = () => {
@@ -213,11 +218,11 @@
               })
             }, 1800)
 
-            document.getElementById('togglePlay').onclick = function () {
+            document.getElementsByName('botao1').onclick = function () {
                 player.togglePlay()
-                console.log('Cliquei')
+                console.log('Cliquei1')
 
-                const getData = fetch('/', {
+                const getData = fetch('/run', {
                   method: "POST",
                   headers: {
                     'Content-Type': 'application/json'
@@ -226,8 +231,37 @@
                     clicked: "1"
                   })
                 })
-                console.log('depois do get data')
               }
+
+              document.getElementById('togglePlay2').onclick = function () {
+              player.togglePlay()
+              console.log('Cliquei2')
+
+              const getData = fetch('/run', {
+                method: "POST",
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  clicked: "2"
+                })
+              })
+            }
+
+            document.getElementById('togglePlay3').onclick = function () {
+              player.togglePlay()
+              console.log('Cliquei3')
+
+              const getData = fetch('/run', {
+                method: "POST",
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  clicked: "3"
+                })
+              })
+            }
           }
         </script>
 
