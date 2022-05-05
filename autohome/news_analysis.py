@@ -73,8 +73,10 @@ class News():
         return translation
 
 
-    def get_text_resume(self, translated_text):
+    def get_text_resume(self, text):
         openai.api_key = os.getenv('OPENAI_API_KEY')
+
+        translated_text = self.translate_text(text)
 
         prompt = 'Summarize this for a second-grade student:\n\n' \
             + translated_text + '\n'
