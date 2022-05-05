@@ -10,3 +10,5 @@ autohome/models/
 .vscode/
 notebooks/
 **/cache
+.python-version
+key.json

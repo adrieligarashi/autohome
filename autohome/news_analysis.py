@@ -6,6 +6,7 @@ from dotenv import find_dotenv, load_dotenv
 from newspaper import Article
 from pygooglenews import GoogleNews
 from googletrans import Translator
+from google.cloud import translate_v2 as translate
 
 
 '''
@@ -43,16 +44,19 @@ class News():
                             'text': text
                             }
 
-    def translate_titles(self):
+    def translate_title(self):
         '''
-        Receives the dict from get_news_from_google_feed, translates the title to
-        english and returns the same dictionary with a new 'translation' key.
+        Receives the dict from get_news_from_google_feed, translates the title
+        and the text to english and returns the same dictionary with new
+        'title_translation' and 'text_translation' keys.
         '''
-        translator = Translator()
+        client = translate.Client()
 
         for content in self.news.values():
-            trans = translator.translate(content['title'], src='pt', dest='en')
-            content['translation'] = trans.text
+            title = content['title']
+            trans_title = client.translate(title, source_language='pt-BR',
+                                           target_language='en')['translatedText']
+            content['title_translation'] = trans_title
 
 
     def get_sentiment_of_news(self):
@@ -64,7 +68,7 @@ class News():
         load_dotenv(path)
         openai.api_key = os.environ.get('OPENAI_API_KEY')
 
-        phrases = [f'{content["translation"]}' for content in self.news.values()]
+        phrases = [f'{content["title_translation"]}' for content in self.news.values()]
         prompt = 'Classify in positive, neutral or negative the sentiment in these phrases:\n\n'
 
         for i, phrase in enumerate(phrases):
@@ -109,7 +113,7 @@ class News():
         '''
         self.news = {}
         self.get_top_news(n)
-        self.translate_titles()
+        self.translate_title()
         self.get_sentiment_of_news()
 
         for i, article in self.news.copy().items():
@@ -150,4 +154,5 @@ if __name__ == '__main__':
     news = News()
     positive, neutral, negative = news.get_news_by_sentiment(n=7)
 
-    print(len(positive), len(neutral), len(negative))
+    print(len(positive) + len(neutral) + len(negative))
+    print(neutral[0])
