@@ -35,6 +35,7 @@ app.config['DEBUG'] = True
 socketio = SocketIO(app)
 camera = Camera(webopencv())
 
+
 client = mqtt_publish.connect_mqtt()
 client.loop_start()
 
@@ -212,6 +213,44 @@ def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
     return Response(gen(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+
+################################ MENUS ###########################
+@app.route('/dataengineering')
+def dataengineering():
+    return render_template('dataengineering.html')
+
+
+@app.route('/flowchart')
+def flowchart():
+    return render_template('flowchart.html')
+
+
+@app.route('/linkedin')
+def linkedin():
+    return render_template('linkedin.html')
+
+
+@app.route('/scope')
+def scope():
+    return render_template('scope.html')
+
+
+@app.route('/technologies')
+def technologies():
+    return render_template('technologies.html')
+
+
+@app.route('/theteam')
+def theteam():
+    return render_template('theteam.html')
+
+
+@app.route('/solutions')
+def solutions():
+    return render_template('solutions.html')
+##################################################################
 
 
 if __name__ == '__main__':
