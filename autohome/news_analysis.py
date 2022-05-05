@@ -1,11 +1,15 @@
+from cmd import PROMPT
+from pydoc import cli
+from urllib import response
 import openai
 import os
 import regex as re
+import html
 
 from dotenv import find_dotenv, load_dotenv
 from newspaper import Article
 from pygooglenews import GoogleNews
-from googletrans import Translator
+from google.cloud import translate_v2 as translate
 
 
 '''
@@ -43,17 +47,59 @@ class News():
                             'text': text
                             }
 
-
-    def translate_titles(self):
+    def translate_title(self):
         '''
-        Receives the dict from get_news_from_google_feed, translates the title to
-        english and returns the same dictionary with a new 'translation' key.
+        Receives the dict from get_news_from_google_feed, translates the title
+        to english and returns the same dictionary with a new
+        'title_translation' key.
         '''
-        translator = Translator()
+        client = translate.Client()
 
         for content in self.news.values():
-            trans = translator.translate(content['title'], src='pt', dest='en')
-            content['translation'] = trans.text
+            title = content['title']
+            trans_title = client.translate(title, source_language='pt-BR',
+                                           target_language='en')['translatedText']
+            trans_title = html.unescape(trans_title)
+            content['title_translation'] = trans_title
+
+
+    def translate_text(self, text):
+        client = translate.Client()
+
+        translation = client.translate(text, source_language='pt-BR',
+                                       target_language='en')['translatedText']
+        translation = html.unescape(translation)
+
+        return translation
+
+
+    def get_text_resume(self, text):
+        openai.api_key = os.getenv('OPENAI_API_KEY')
+
+        translated_text = self.translate_text(text)
+
+        prompt = 'Summarize this for a second-grade student:\n\n' \
+            + translated_text + '\n'
+
+        response = openai.Completion.create(
+            engine='text-davinci-002',
+            prompt=prompt,
+            temperature=0.7,
+            max_tokens=1000,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+
+        resume = response['choices'][0]['text']
+
+        client = translate.Client()
+
+        resume_translation = client.translate(resume, source_language='en',
+                                              target_language='pt-BR')['translatedText']
+        resume_translation = html.unescape(resume_translation)
+
+        return resume_translation
 
 
     def get_sentiment_of_news(self):
@@ -65,18 +111,18 @@ class News():
         load_dotenv(path)
         openai.api_key = os.environ.get('OPENAI_API_KEY')
 
-        phrases = [f'{content["translation"]}' for content in self.news.values()]
+        phrases = [f'{content["title_translation"]}' for content in self.news.values()]
         prompt = 'Classify in positive, neutral or negative the sentiment in these phrases:\n\n'
 
         for i, phrase in enumerate(phrases):
             prompt += f'{i+1}. "{phrase}"\n'
-        prompt += '\nPhrases sentiment reatings:\n'
+        prompt += '\nPhrases sentiment ratings:\n'
 
         res = openai.Completion.create(
             engine='text-davinci-002',
             prompt=prompt,
             temperature=0,
-            max_tokens=60,
+            max_tokens=150,
             top_p=1.0,
             frequency_penalty=0.0,
             presence_penalty=0.0
@@ -110,7 +156,7 @@ class News():
         '''
         self.news = {}
         self.get_top_news(n)
-        self.translate_titles()
+        self.translate_title()
         self.get_sentiment_of_news()
 
         for i, article in self.news.copy().items():
@@ -118,6 +164,7 @@ class News():
                 _ = self.news.pop(i, None)
 
         return self.news
+
 
     def get_news_by_sentiment(self, n=5):
         '''
@@ -131,6 +178,7 @@ class News():
         '''
         if not self.news:
             self.get_news(n)
+
 
         positive_news = []
         neutral_news = []
@@ -151,4 +199,6 @@ if __name__ == '__main__':
     news = News()
     positive, neutral, negative = news.get_news_by_sentiment(n=7)
 
-    print(len(positive), len(neutral), len(negative))
+    traduzido = news.translate_text(neutral[0]['text'])
+    resumo = news.get_text_resume(traduzido)
+    print(resumo)

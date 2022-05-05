@@ -6,7 +6,10 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from keras.applications.xception import preprocess_input
 from autohome.FastMTCNN import FastMTCNN
+import os
 
+# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+# os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 
 marcos, adriel, vitor = load_saves()
 
@@ -27,11 +30,18 @@ n_mean = 1
 pred_resume = np.array([0, 0, 0, 0.1])
 
 loaded_model = load_model('autohome/models/trained_vggface.h5')
-# loaded_model_gender = load_model('autohome/models/model_gender.h5')
 loaded_model_gender = load_model('autohome/models/model_gender.h5')
-# loaded_model_ethiny = load_model('autohome/models/model_ethiny.h5')
-# loaded_model_age = load_model('autohome/models/model_age.h5')
 loaded_model_age = load_model('autohome/models/age_prediction.h5')
+
+# loaded_model = load_model('autohome/models/trained_vggface_teste.h5')
+# loaded_model_gender = load_model('autohome/models/model_gender_teste.h5')
+# loaded_model_age = load_model('autohome/models/age_prediction_teste.h5')
+
+# loaded_model.compile()
+# loaded_model_gender.compile()
+# loaded_model_age.compile()
+
+
 model_recognition = load_model_recognition()
 
 

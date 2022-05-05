@@ -82,5 +82,5 @@ matplotlib
 pandas
 newspaper3k
 pygooglenews
-googletrans==4.0.0rc1
+google-cloud-translate
 openai

@@ -43,8 +43,6 @@ news = News()
 n_news = 7
 
 positive_news, neutral_news, negative_news = news.get_news_by_sentiment(n=n_news)
-len_pos, len_neut, len_neg = len(positive_news), len(neutral_news), len(negative_news)
-print(len_pos, len_neut, len_neg)
 
 
 @socketio.on('input image', namespace='/test')
@@ -169,17 +167,17 @@ def run():
 
         if clicks is not None:
             if clicks['clicked'] == '1':
-                mqtt_publish.publish(client,
-                                 topic='le_wagon_769_news',
-                                 msg=f"{texts[0]}")
+                proper_new = texts[0]
             elif clicks['clicked'] == '2':
-                mqtt_publish.publish(client,
-                                 topic='le_wagon_769_news',
-                                 msg=f"{texts[1]}")
+                proper_new = texts[1]
             elif clicks['clicked'] == '3':
-                mqtt_publish.publish(client,
+                proper_new = texts[2]
+
+
+            resume = news.get_text_resume(proper_new)
+            mqtt_publish.publish(client,
                                  topic='le_wagon_769_news',
-                                 msg=f"{texts[2]}")
+                                 msg=f"{resume}")
 
 
     return render_template('run.html',
