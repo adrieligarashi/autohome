@@ -50,8 +50,7 @@ class News():
     def translate_title(self):
         '''
         Receives the dict from get_news_from_google_feed, translates the title
-        to english and returns the same dictionary with a new
-        'title_translation' key.
+        to english and adds a new 'title_translation' key to self.news.
         '''
         client = translate.Client()
 
@@ -64,6 +63,13 @@ class News():
 
 
     def translate_text(self, text):
+        '''
+        Receives a text in porguese and returns it translated to english.
+        -----------
+        Parameters: - text: A str with the text in pt-BR to be translated
+        -----------
+        Returns: - translation: The translated str text in english.
+        '''
         client = translate.Client()
 
         translation = client.translate(text, source_language='pt-BR',
@@ -74,6 +80,14 @@ class News():
 
 
     def get_text_resume(self, text):
+        '''
+        Receives an english text and returns it resumed and in pt-BR.
+        -----------
+        Parameters: - text: A str with the text in english to be resumed
+        -----------
+        Returns: - resume_translation: A str with the given text resumed and
+                    translated to pt-BR.
+        '''
         openai.api_key = os.getenv('OPENAI_API_KEY')
 
         translated_text = self.translate_text(text)

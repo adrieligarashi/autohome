@@ -4,11 +4,9 @@ FROM python:3.7
 
 COPY . ./
 
-RUN apt-get update
+RUN apt-get update && apt-get upgrade -y
 RUN apt-get install ffmpeg libsm6 libxext6  -y
 RUN pip install -r ./requirements.txt
-
-
 
 EXPOSE 8000
 EXPOSE 8080
