@@ -93,11 +93,13 @@ def run():
 
         if na_casa == '1':
             felling_spotify = text
-            uri, _ = sp.create_custom_playlist(mood=felling_spotify)
+            uri = sp.create_custom_playlist(mood=felling_spotify)
             token = sp.auth.get_cached_token()['access_token']
             mqtt_publish.publish(client,
                                  topic='le_wagon_769',
                                  msg=f"{felling_spotify}, {text_recognition}")
+
+            sp.clear_instance()
 
 
             if felling_spotify.lower() == 'happy' or felling_spotify.lower() == 'neutral':
@@ -166,6 +168,10 @@ def run():
             print('nao deu ainda clicked getjson')
 
         if clicks is not None:
+
+            uri = sp.create_custom_playlist(mood=felling_spotify)
+            token = sp.auth.get_cached_token()['access_token']
+
             if clicks['clicked'] == '1':
                 proper_new = texts[0]
             elif clicks['clicked'] == '2':
@@ -178,6 +184,8 @@ def run():
             mqtt_publish.publish(client,
                                  topic='le_wagon_769_news',
                                  msg=f"{resume}")
+
+            sp.clear_instance()
 
 
     return render_template('run.html',

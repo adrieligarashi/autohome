@@ -13,3 +13,4 @@ notebooks/
 .python-version
 key.json
 GCP/
+autohome/caches/*
