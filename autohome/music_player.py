@@ -2,7 +2,7 @@ import spotipy
 import os
 
 from random import sample
-from spotipy.oauth2 import SpotifyPKCE, SpotifyOAuth
+from spotipy.oauth2 import SpotifyOAuth
 from dotenv import find_dotenv, load_dotenv
 
 
@@ -31,7 +31,7 @@ class MusicPlayer(spotipy.Spotify):
         env_path = find_dotenv()
         load_dotenv(env_path)
 
-        cache_path = './autohome/caches/cache'
+        cache_path = './cache'
         print(cache_path)
 
 
@@ -50,6 +50,7 @@ class MusicPlayer(spotipy.Spotify):
             "playlist-modify-private"
         ]
         self.auth = SpotifyOAuth(scope=scope, cache_path=cache_path, open_browser=True)
+        print('musica autorizada')
         super().__init__(auth_manager=self.auth)
         self.user_id = self.current_user()["id"]
         self.playlist_uri = None
