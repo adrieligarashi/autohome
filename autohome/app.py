@@ -68,7 +68,6 @@ def test_connect():
 @app.route('/')
 def index():
     global sp
-
     sp = MusicPlayer()
 
     return render_template('index.html')
@@ -86,6 +85,7 @@ def run():
 
     clicks = {}
     front_news = []
+
 
     if request.method == 'POST':
         na_casa = request.form.get('botaocasa')
