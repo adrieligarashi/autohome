@@ -1,6 +1,3 @@
-from cmd import PROMPT
-from pydoc import cli
-from urllib import response
 import openai
 import os
 import regex as re
@@ -24,6 +21,8 @@ class News():
         self.top_news = gn.top_news()['entries']
 
         self.news = None
+
+        print('classe news criada')
 
 
     def get_top_news(self, n=5):

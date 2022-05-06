@@ -3,8 +3,8 @@ from autohome.utils import pil_image_to_array, array_to_base64, get_age, get_gen
 import copy
 import cv2
 import numpy as np
-from keras.models import load_model
-from keras.applications.xception import preprocess_input
+from tensorflow.keras.models import load_model
+from tensorflow.keras.applications.xception import preprocess_input
 from autohome.FastMTCNN import FastMTCNN
 import os
 

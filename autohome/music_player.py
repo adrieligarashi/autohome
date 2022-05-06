@@ -32,7 +32,9 @@ class MusicPlayer(spotipy.Spotify):
         load_dotenv(env_path)
 
         cwd = os.getcwd()
+        print(cwd)
         cache_path = cwd + '/autohome/caches/cache'
+        print(cache_path)
 
 
         if os.path.exists(cache_path):
@@ -50,7 +52,7 @@ class MusicPlayer(spotipy.Spotify):
             "playlist-modify-private"
         ]
 
-        self.auth = SpotifyPKCE(scope=scope, cache_path=cache_path)
+        self.auth = SpotifyPKCE(scope=scope, cache_path=cache_path, open_browser=True)
         super().__init__(auth_manager=self.auth)
         self.user_id = self.current_user()["id"]
         self.playlist_uri = None
@@ -137,7 +139,7 @@ class MusicPlayer(spotipy.Spotify):
         self.playlist_add_items(self.playlist_uri, self.tracks_uri[:5])
         self.playlist_add_items(self.playlist_uri, self.recommendations_uri)
 
-        return self.playlist_uri, self.playlist_id
+        return self.playlist_uri
 
 
     def get_device_id(self) -> str:
@@ -168,9 +170,19 @@ class MusicPlayer(spotipy.Spotify):
         except:
             return "No active device"
 
+    def clear_instance(self):
+        self.playlist_uri = None
+        self.playlist_id = None
+        self.recommendations_uri = None
+        self.device = None
+        self.mood = None
+
 
 if __name__ == "__main__":
     sp = MusicPlayer()
     sp.create_custom_playlist('angry')
     id = sp.devices()
     print(id)
+    sp.clear_instance()
+    print(sp.mood)
+    print(sp.playlist_uri)
