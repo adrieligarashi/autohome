@@ -83,3 +83,4 @@ newspaper3k
 pygooglenews
 google-cloud-translate
 openai
+google-cloud-translate
