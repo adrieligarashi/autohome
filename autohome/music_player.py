@@ -2,7 +2,7 @@ import spotipy
 import os
 
 from random import sample
-from spotipy.oauth2 import SpotifyPKCE
+from spotipy.oauth2 import SpotifyPKCE, SpotifyOAuth
 from dotenv import find_dotenv, load_dotenv
 
 
@@ -49,8 +49,7 @@ class MusicPlayer(spotipy.Spotify):
             "playlist-modify-public",
             "playlist-modify-private"
         ]
-
-        self.auth = SpotifyPKCE(scope=scope, cache_path=cache_path, open_browser=True)
+        self.auth = SpotifyOAuth(scope=scope, cache_path=cache_path, open_browser=True)
         super().__init__(auth_manager=self.auth)
         self.user_id = self.current_user()["id"]
         self.playlist_uri = None
