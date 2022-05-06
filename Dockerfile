@@ -3,15 +3,15 @@ FROM python:3.7
 # WORKDIR /webflask
 
 COPY . ./
-COPY /autohome/caches/cache /autohome/caches/cache
 
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install ffmpeg libsm6 libxext6  -y
+RUN apt-get install ffmpeg libsm6 libxext6 vim -y
 RUN pip install -r ./requirements.txt
 
 EXPOSE 8000
 EXPOSE 8080
 EXPOSE 1883
+EXPOSE 3002
 
 #ENTRYPOINT ["streamlit", "run", "autohome/main_site.py", "--server.port=8501", "--server.address=0.0.0.0"]
 

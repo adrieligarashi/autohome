@@ -31,9 +31,7 @@ class MusicPlayer(spotipy.Spotify):
         env_path = find_dotenv()
         load_dotenv(env_path)
 
-        cwd = os.getcwd()
-        print(cwd)
-        cache_path = cwd + '/autohome/caches/cache'
+        cache_path = './autohome/caches/cache'
         print(cache_path)
 
 
