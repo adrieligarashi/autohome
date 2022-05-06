@@ -145,7 +145,7 @@ def run():
                     if len(front_news) >= 3:
                         break
 
-            if len(front_news) < 3:
+            while len(front_news) < 3:
                 place_holder = {'title': 'Não tem notícia pra você hoje.',
                                 'text': 'Desculpe, mas não tenho uma notícia apropriada para você hoje.',
                                 'url': '/'}
