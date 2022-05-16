@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.8.13-buster
 
 # WORKDIR /webflask
 
@@ -17,6 +17,6 @@ EXPOSE 3002
 
 # CMD gunicorn -k eventlet -b 0.0.0.0:5005 -w 1 app:app
 
-WORKDIR /app/app
+WORKDIR /app
 
 CMD gunicorn -k eventlet -w 1 autohome.app:app --log-file=- --timeout 600
