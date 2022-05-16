@@ -84,3 +84,4 @@ pygooglenews
 google-cloud-translate
 openai
 google-cloud-translate
+Flask-Session

@@ -14,3 +14,4 @@ notebooks/
 key.json
 GCP/
 autohome/caches/*
+.flask_session/*

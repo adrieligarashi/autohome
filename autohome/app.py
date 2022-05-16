@@ -1,7 +1,9 @@
+import re
 from sys import stdout
 from autohome.process import webopencv
 import logging
-from flask import Flask, render_template, Response, request, jsonify
+from flask import Flask, render_template, Response, request, jsonify, redirect, session
+from flask_session import Session
 from flask_socketio import SocketIO, emit
 from autohome.camera import Camera
 from autohome.image_processing import image_proc
@@ -9,7 +11,15 @@ import numpy as np
 from autohome.music_player import MusicPlayer
 from autohome.mqtt import mqtt_publish
 from autohome.news_analysis import News
+from autohome.auth_backup.oauth2 import SpotifyOAuth
+from dotenv import find_dotenv, load_dotenv
+import uuid
+import spotipy
+import os
 
+
+env_path = find_dotenv()
+load_dotenv(env_path)
 
 pred_resume = np.array([0, 0, 0, 0.1])
 text_list = [
@@ -30,8 +40,11 @@ urls = ['/run', '/run', '/run']
 
 app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler(stdout))
-app.config['SECRET_KEY'] = 'secret!'
+app.config['SECRET_KEY'] = os.urandom(64)
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_FILE_DIR'] = './.flask_session/'
 app.config['DEBUG'] = True
+Session(app)
 socketio = SocketIO(app)
 camera = Camera(webopencv())
 
@@ -43,6 +56,14 @@ news = News()
 n_news = 7
 
 positive_news, neutral_news, negative_news = news.get_news_by_sentiment(n=n_news)
+
+
+caches_folder = './app/users/'
+if not os.path.exists(caches_folder):
+    os.makedirs(caches_folder)
+
+def session_cache_path():
+    return caches_folder + session.get('uuid')
 
 
 @socketio.on('input image', namespace='/test')
@@ -67,9 +88,6 @@ def test_connect():
 
 @app.route('/')
 def index():
-    global sp
-    sp = MusicPlayer()
-
     return render_template('index.html')
 
 
@@ -86,18 +104,36 @@ def run():
     clicks = {}
     front_news = []
 
+    if not session.get('uuid'):
+        session['uuid'] = str(uuid.uuid4())
+
+    scope = 'playlist-read-private,user-modify-playback-state,user-read-playback-state,user-read-currently-playing,app-remote-control,streaming,playlist-modify-public,playlist-modify-private'
+
+    cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
+    auth_manager = SpotifyOAuth(scope=scope, cache_handler=cache_handler, show_dialog=True)
+
+    if request.args.get('code'):
+        auth_manager.get_access_token(request.args.get('code'))
+        return redirect('/run')
+
+    if not auth_manager.validate_token(cache_handler.get_cached_token()):
+        auth_url = auth_manager.get_authorize_url()
+        return redirect(auth_url)
+
 
     if request.method == 'POST':
         na_casa = request.form.get('botaocasa')
         print(na_casa, type(na_casa))
 
+        sp = MusicPlayer(auth_manager)
+
         if na_casa == '1':
             felling_spotify = text
             uri = sp.create_custom_playlist(mood=felling_spotify)
-            token = sp.auth.get_cached_token()['access_token']
-            mqtt_publish.publish(client,
-                                 topic='le_wagon_769',
-                                 msg=f"{felling_spotify}, {text_recognition}")
+            token = auth_manager.get_cached_token()['access_token']
+            # mqtt_publish.publish(client,
+            #                      topic='le_wagon_769',
+            #                      msg=f"{felling_spotify}, {text_recognition}")
 
             sp.clear_instance()
 
@@ -181,9 +217,9 @@ def run():
 
 
             resume = news.get_text_resume(proper_new)
-            mqtt_publish.publish(client,
-                                 topic='le_wagon_769_news',
-                                 msg=f"{resume}")
+            # mqtt_publish.publish(client,
+            #                      topic='le_wagon_769_news',
+            #                      msg=f"{resume}")
 
             sp.clear_instance()
 

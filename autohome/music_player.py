@@ -1,9 +1,6 @@
 import spotipy
-import os
 
 from random import sample
-from spotipy.oauth2 import SpotifyOAuth
-from dotenv import find_dotenv, load_dotenv
 
 
 class MusicPlayer(spotipy.Spotify):
@@ -26,32 +23,9 @@ class MusicPlayer(spotipy.Spotify):
         - SPOTIPY_REDIRECT_URI
     """
 
-    def __init__(self) -> None:
+    def __init__(self, auth) -> None:
 
-        env_path = find_dotenv()
-        load_dotenv(env_path)
-
-        cache_path = './cache'
-        print(cache_path)
-
-
-        if os.path.exists(cache_path):
-            os.remove(cache_path)
-
-
-        scope = [
-            "playlist-read-private",
-            "user-modify-playback-state",
-            "user-read-playback-state",
-            "user-read-currently-playing",
-            "app-remote-control",
-            "streaming",
-            "playlist-modify-public",
-            "playlist-modify-private"
-        ]
-        self.auth = SpotifyOAuth(scope=scope, cache_path=cache_path, open_browser=True)
-        print('musica autorizada')
-        super().__init__(auth_manager=self.auth)
+        super().__init__(auth_manager=auth)
         self.user_id = self.current_user()["id"]
         self.playlist_uri = None
         self.playlist_id = None
